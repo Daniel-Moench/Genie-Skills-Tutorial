@@ -1,0 +1,194 @@
+/* course.css — shared stylesheet for all lessons and reference docs.
+   Tufte-inspired: generous whitespace, readable measure, print-friendly. */
+
+:root {
+  --ink: #1a1a1a;
+  --paper: #fffff8;
+  --muted: #6b6b6b;
+  --accent: #8a0000;
+  --rule: #ddddd0;
+  --code-bg: #f4f4ec;
+  --ok: #1a6b2a;
+  --bad: #a01818;
+  --ok-bg: #e9f5ec;
+  --bad-bg: #f9e9e9;
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 17px; }
+
+body {
+  font-family: Palatino, "Palatino Linotype", Georgia, serif;
+  color: var(--ink);
+  background: var(--paper);
+  margin: 0;
+  padding: 3rem 1.5rem 5rem;
+  line-height: 1.65;
+}
+
+main {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+h1, h2, h3 {
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 2.2rem 0 0.8rem;
+}
+
+h1 { font-size: 2.1rem; font-style: italic; margin-top: 0; }
+h2 { font-size: 1.45rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.3rem; }
+h3 { font-size: 1.15rem; font-style: italic; }
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: Consolas, Menlo, monospace;
+}
+
+.lede { font-size: 1.1rem; color: #333; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+code, pre {
+  font-family: Consolas, Menlo, "DejaVu Sans Mono", monospace;
+  font-size: 0.85em;
+}
+
+code {
+  background: var(--code-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+pre code { background: none; padding: 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* Callout blocks: label + hairline rules, no boxes */
+.win, .try, .source, .teacher {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.8rem 0.2rem;
+  margin: 1.8rem 0;
+}
+
+.win::before, .try::before, .source::before, .teacher::before {
+  display: block;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+
+.win::before { content: "The win"; }
+.try::before { content: "Try it — ~5 minutes"; }
+.source::before { content: "Primary source"; }
+.teacher::before { content: "Stuck or curious?"; }
+
+/* Quiz */
+.quiz { margin: 2rem 0; }
+
+.quiz fieldset {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin: 1.1rem 0;
+  padding: 0.9rem 1.1rem;
+}
+
+.quiz legend {
+  font-weight: 600;
+  padding: 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.quiz button.answer {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 0.4rem 0;
+  padding: 0.5rem 0.8rem;
+  font: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.quiz button.answer:hover:not(:disabled) { border-color: var(--accent); }
+.quiz button.answer:disabled { cursor: default; }
+.quiz button.answer.correct { background: var(--ok-bg); border-color: var(--ok); }
+.quiz button.answer.incorrect { background: var(--bad-bg); border-color: var(--bad); }
+
+.quiz .explain {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  color: #333;
+  border-top: 1px dashed var(--rule);
+  padding-top: 0.5rem;
+}
+
+.quiz .verdict { font-weight: 600; }
+.quiz .verdict.ok { color: var(--ok); }
+.quiz .verdict.bad { color: var(--bad); }
+
+.quiz .score {
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Footer nav */
+.lesson-nav {
+  margin-top: 3.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.lesson-nav ul { list-style: none; padding: 0; }
+.lesson-nav li { margin: 0.25rem 0; }
+
+@media print {
+  body { padding: 0; }
+  .quiz button.answer { border: 1px solid #999; }
+  .lesson-nav, .teacher { display: none; }
+  a { color: inherit; }
+}

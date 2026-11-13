@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference · Skill discovery cheat sheet</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference 0001 · AI agent skills for GitHub Copilot</p>
+  <h1>Skill discovery cheat sheet</h1>
+
+  <h2>Discovery tiers</h2>
+  <table>
+    <tr><th>Tier</th><th>Path</th><th>Scope</th></tr>
+    <tr><td>Personal</td><td><code>~\.copilot\skills\</code> · <code>~\.agents\skills\</code> · <code>~\.claude\skills\</code></td><td>User-wide</td></tr>
+    <tr><td>Repository</td><td><code>.github\skills\</code> · <code>.agents\skills\</code> · <code>.claude\skills\</code></td><td>Repo-wide</td></tr>
+    <tr><td>Plugin</td><td><code>~\.copilot\installed-plugins\&lt;marketplace&gt;\&lt;plugin&gt;\skills\</code></td><td>User-wide</td></tr>
+  </table>
+
+  <h2>Wiring files</h2>
+  <table>
+    <tr><th>File</th><th>Holds</th></tr>
+    <tr><td><code>~\.copilot\config.json</code></td><td>Marketplace registrations (source repos of plugins)</td></tr>
+    <tr><td><code>~\.copilot\settings.json</code></td><td>Plugin enable flags, e.g. <code>"pstack@pstack-claude": true</code></td></tr>
+  </table>
+
+  <h2>Loading model</h2>
+  <ul>
+    <li><strong>Always in prompt:</strong> name + description of (most) skills — the index.</li>
+    <li><strong>On invocation only:</strong> SKILL.md body + linked extra files.</li>
+    <li><strong>Large plugins:</strong> partial index; unlisted skills still load by exact name.</li>
+  </ul>
+
+  <h2>Invocation paths</h2>
+  <ol>
+    <li><strong>Slash command</strong> — user-explicit: <code>/teach</code></li>
+    <li><strong>Description match</strong> — model-automatic; description = trigger surface</li>
+    <li><strong>Named by another skill</strong> — e.g. <code>poteto-mode</code> → <code>tdd</code></li>
+  </ol>
+
+  <h2>This machine (verified 2026-11-13)</h2>
+  <table>
+    <tr><th>Provider</th><th>Install dir under <code>installed-plugins\</code></th><th>Skills</th><th>Flagship</th></tr>
+    <tr><td>addyosmani/agent-skills</td><td><code>addy-agent-skills\agent-skills</code></td><td>25</td><td>engineering-practice playbooks</td></tr>
+    <tr><td>mattpocock/skills</td><td><code>mattpocock\mattpocock-skills</code></td><td>40</td><td><code>teach</code>, <code>grilling</code>, <code>tdd</code></td></tr>
+    <tr><td>michael-denyer/pstack-claude</td><td><code>pstack-claude\pstack</code></td><td>~70</td><td><code>poteto-mode</code> router + principles</td></tr>
+    <tr><td>humanlayer/skills</td><td><code>skills\&lt;skill-name&gt;</code></td><td>7</td><td><code>rpi</code> (research→plan→implement)</td></tr>
+    <tr><td>direct installs</td><td><code>_direct\…</code></td><td>1</td><td>ai-prompt-engineering-safety-review</td></tr>
+  </table>
+
+  <h2>Known collisions</h2>
+  <p><code>tdd</code> (mattpocock) · <code>tdd</code> (pstack) ·
+  <code>test-driven-development</code> (addyosmani). Disambiguate with plugin
+  namespace: <code>pstack:tdd</code> vs <code>mattpocock-skills:tdd</code>.</p>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Lesson: <a href="../lessons/0001-skill-discovery-and-loading.html">0001 · How Copilot discovers and loads skills</a></li>
+      <li>Source: <a href="https://docs.github.com/en/copilot/concepts/customizations/agent-skills">GitHub Docs — Agent skills</a></li>
+    </ul>
+  </nav>
+</main>
+</body>
+</html>

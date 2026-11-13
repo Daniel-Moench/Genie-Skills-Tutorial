@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 · How Copilot discovers and loads skills</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lesson 0001 · AI agent skills for GitHub Copilot</p>
+  <h1>How Copilot discovers and loads skills</h1>
+  <p class="lede">You know what a skill <em>is</em>. This lesson is about the
+  machinery around it: how a <code>SKILL.md</code> on disk ends up influencing
+  a session, and why only part of it enters the model's context — and when.</p>
+
+  <div class="win">
+    After this lesson you can trace any skill in your session back to a file
+    on disk, and predict <em>which of the three invocation paths</em> will
+    make it fire.
+  </div>
+
+  <h2>1 · Three discovery tiers</h2>
+  <p>Copilot looks for skills in three kinds of places
+  (<a href="https://docs.github.com/en/copilot/concepts/customizations/agent-skills">official
+  docs</a>):</p>
+  <table>
+    <tr><th>Tier</th><th>Location</th><th>Scope</th></tr>
+    <tr>
+      <td>Personal folders</td>
+      <td><code>~\.copilot\skills\</code> (also honours <code>~\.agents\skills\</code>, <code>~\.claude\skills\</code>)</td>
+      <td>You, every project</td>
+    </tr>
+    <tr>
+      <td>Repository folders</td>
+      <td><code>.github\skills\</code> (also <code>.agents\skills\</code>, <code>.claude\skills\</code>)</td>
+      <td>Everyone in that repo</td>
+    </tr>
+    <tr>
+      <td>Installed plugins</td>
+      <td><code>~\.copilot\installed-plugins\&lt;marketplace&gt;\&lt;plugin&gt;\skills\</code></td>
+      <td>You, every project</td>
+    </tr>
+  </table>
+  <p>All four of your providers arrived through tier 3. On your machine:</p>
+  <pre><code>~\.copilot\installed-plugins\
+├── addy-agent-skills\agent-skills\skills\      25 skills
+├── mattpocock\mattpocock-skills\skills\        40 skills
+├── pstack-claude\pstack\skills\               ~70 skills
+├── skills\  (= humanlayer, one folder/skill)    7 skills
+└── _direct\ (single skill installs)             1 skill</code></pre>
+  <p>Two files wire plugins up: <code>~\.copilot\config.json</code> records the
+  <em>marketplace</em> (e.g. the GitHub repo <code>michael-denyer/pstack-claude</code>),
+  and <code>~\.copilot\settings.json</code> records that the plugin is
+  <em>enabled</em> (<code>"pstack@pstack-claude": true</code>). Because all of
+  this is user-level, the same inventory follows you into VSCode, IntelliJ,
+  the Desktop App, and the CLI.</p>
+
+  <h2>2 · From disk to prompt: progressive disclosure</h2>
+  <p>Discovery does <strong>not</strong> mean 70 pstack skill bodies get pasted
+  into every session. At session start, only each skill's <code>name</code> +
+  <code>description</code> frontmatter is listed in the system prompt (an
+  <em>available skills</em> index). The body of <code>SKILL.md</code> — the
+  actual instructions — enters the context <em>only when the skill is
+  invoked</em>. That's the whole trick that makes ~140 installed skills
+  affordable: cheap index always, expensive body on demand.</p>
+  <p>One wrinkle you can verify on your own machine: when a plugin is very
+  large, Copilot lists only <em>part</em> of its skills in the prompt index.
+  The unlisted rest is still installed and still loads — but only when named
+  exactly (by you, or by another skill).</p>
+
+  <h2>3 · Three ways a skill fires</h2>
+  <table>
+    <tr><th>Path</th><th>Who triggers</th><th>Example</th></tr>
+    <tr>
+      <td>Slash command</td>
+      <td>You, explicitly</td>
+      <td><code>/teach</code> built this workspace</td>
+    </tr>
+    <tr>
+      <td>Description match</td>
+      <td>The model, automatically</td>
+      <td>You say “review this diff” → a skill whose description says
+      <em>“Use when reviewing code…”</em> is loaded first</td>
+    </tr>
+    <tr>
+      <td>Named by another skill</td>
+      <td>A skill or instruction file</td>
+      <td>pstack's <code>poteto-mode</code> routes to <code>tdd</code>,
+      <code>architect</code>, … by name</td>
+    </tr>
+  </table>
+  <p>Consequence: the <code>description</code> field is not documentation —
+  it is the <em>trigger surface</em>. That's why good providers write them as
+  “Use when…” rules. When you later curate your set, badly written
+  descriptions are a legitimate reason to drop a skill: they misfire.</p>
+
+  <h2>4 · Collisions</h2>
+  <p>You currently have <em>three</em> TDD skills installed:
+  <code>test-driven-development</code> (addyosmani), <code>tdd</code>
+  (mattpocock), and <code>tdd</code> (pstack). Their descriptions overlap, so
+  on a “write tests first” task the model must pick one — and which one wins
+  is not guaranteed. Plugins namespace their skills
+  (<code>pstack:tdd</code> vs <code>mattpocock-skills:tdd</code>), which lets
+  <em>you</em> disambiguate explicitly, but automatic description-matching
+  remains a lottery between overlapping providers. This is the core problem
+  your final curation lesson will solve: keep one winner per job, or install
+  a router (pstack's <code>poteto-mode</code> is exactly that — more in
+  lesson 2).</p>
+
+  <div class="try">
+    <ol>
+      <li>Count your real inventory:
+        <pre><code>Get-ChildItem ~\.copilot\installed-plugins -Recurse -Filter SKILL.md | Measure-Object</code></pre></li>
+      <li>Open one unfamiliar <code>SKILL.md</code> (pick from
+        <code>skills\rpi\</code> in the humanlayer folder) and read <em>only
+        the frontmatter</em>. Predict: what user sentence would auto-trigger
+        it?</li>
+      <li>Prove on-demand loading: in a fresh Copilot session, invoke a pstack
+        skill that is <em>not</em> listed in your prompt (e.g.
+        <code>poteto-help</code>) by name. It loads anyway — tier-3 discovery
+        plus name-addressing at work.</li>
+    </ol>
+  </div>
+
+  <h2>Check yourself</h2>
+  <div id="quiz"></div>
+
+  <div class="source">
+    <a href="https://docs.github.com/en/copilot/concepts/customizations/agent-skills">
+    GitHub Docs: Agent skills</a> — the canonical reference for discovery
+    locations and SKILL.md anatomy. Ten-minute read; everything in section 1
+    is sourced from it.
+  </div>
+
+  <div class="teacher">
+    Ask your agent-teacher follow-up questions any time — e.g. “show me the
+    exact <em>available skills</em> index of this session” or “why did skill
+    X fire instead of Y?”. That second question is a great live experiment.
+  </div>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Next: Lesson 0002 — pstack demystified (planned)</li>
+      <li>Reference: <a href="../reference/0001-skill-discovery-cheatsheet.html">Skill discovery cheat sheet</a></li>
+      <li>Workspace: <a href="../GLOSSARY.md">Glossary</a> · <a href="../MISSION.md">Mission</a></li>
+    </ul>
+  </nav>
+</main>
+
+<script src="../assets/quiz.js"></script>
+<script>
+renderQuiz("quiz", [
+  {
+    q: "Where does the full body of a SKILL.md enter the model's context?",
+    answers: [
+      "At session start, with every other skill",
+      "Only when the skill is actually invoked",
+      "When its plugin registers in config.json",
+    ],
+    correct: 1,
+    explain: "Progressive disclosure: the prompt carries only name + description; the body loads on invocation (section 2).",
+  },
+  {
+    q: "What makes a skill eligible for automatic, model-initiated invocation?",
+    answers: [
+      "Its description matching the task at hand",
+      "Its position within the available skills list",
+      "Its folder living inside the current repo",
+    ],
+    correct: 0,
+    explain: "The description field is the trigger surface — which is why overlapping descriptions cause collisions (sections 3–4).",
+  },
+  {
+    q: "Your prompt index lists only some pstack skills. What is true of the rest?",
+    answers: [
+      "They are disabled until the sheet lists them",
+      "They are missing until the plugin reinstalls fully",
+      "They still load when named by exact name",
+    ],
+    correct: 2,
+    explain: "Large plugins get a partial index, but every installed skill remains addressable by name (section 2).",
+  },
+  {
+    q: "Which file records that the pstack plugin is enabled on your machine?",
+    answers: [
+      "The repo-level copilot-instructions.md in .github",
+      "The user-level settings.json in ~/.copilot",
+      "The plugin-level hooks.json in its folder",
+    ],
+    correct: 1,
+    explain: "config.json knows the marketplace; settings.json holds the enable flag (\"pstack@pstack-claude\": true) (section 1).",
+  },
+]);
+</script>
+</body>
+</html>
