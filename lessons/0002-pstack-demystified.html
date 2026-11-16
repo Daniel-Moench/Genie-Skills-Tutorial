@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2 · The pstack machinery, demystified</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lesson 0002 · AI agent skills for GitHub Copilot</p>
+  <h1>The pstack machinery, demystified</h1>
+  <p class="lede">Every session on your machine opens with an
+  <code>&lt;EXTREMELY_IMPORTANT&gt;</code> block demanding poteto-mode. You never
+  asked for it in that session, and no skill was invoked. This lesson traces
+  exactly where it comes from — three files on disk — and what each switch
+  does.</p>
+
+  <div class="win">
+    After this lesson you can trace every pstack behavior in your sessions to
+    a specific file on disk, and you know which switch turns each one off —
+    the groundwork for your keep/remove/reconfigure decision.
+  </div>
+
+  <h2>1 · The whole setup is three artifacts</h2>
+  <p>Everything pstack does on your machine comes from these files
+  (verified locally; tier-3 discovery from
+  <a href="0001-skill-discovery-and-loading.html">lesson 1</a>):</p>
+  <pre><code>~\.copilot\
+├── settings.json                  # "pstack@pstack-claude": true  ← the enable flag
+├── pstack-models.md               # your role → model choices     ← the model sheet
+└── installed-plugins\pstack-claude\pstack\
+    ├── skills\                    # ~70 skills (poteto-mode, architect, arena…)
+    ├── agents\                    # pstack:poteto-agent, pstack:comment-sicko…
+    ├── models.json                # legal roles + effort levels (sheet validator)
+    └── hooks\
+        ├── copilot-hooks.json     # registers the hooks with Copilot
+        ├── session-start.ps1      # assembles the injected block (Windows)
+        ├── session-start-context.md   # the EXTREMELY_IMPORTANT mandate text
+        └── session-start-copilot*.md  # Copilot notes + sheet/setup variants</code></pre>
+  <p>Note what is <em>not</em> there: no daemon, no network calls, no hidden
+  state. The <code>setup-pstack</code> skill you once ran generated exactly one
+  file — the model sheet. Everything else ships inside the plugin folder.</p>
+
+  <h2>2 · The hook: how the mandate enters every session</h2>
+  <p>Copilot supports <a
+  href="https://docs.github.com/en/copilot/concepts/customizations/hooks">hooks</a>
+  — shell commands that run at lifecycle points like session start or before a
+  tool call (<a
+  href="https://docs.github.com/en/copilot/reference/hooks-reference">reference</a>).
+  pstack ships its hook registration in
+  <code>hooks\copilot-hooks.json</code>:</p>
+
+  <pre class="mermaid">
+flowchart TD
+  A["Session event:<br>startup · resume · clear · compact"] --> B["copilot-hooks.json<br>SessionStart matcher fires"]
+  B --> C["session-start.ps1 copilot<br>(session-start.sh on Unix)"]
+  C --> D{"pstack-models.md valid<br>against models.json?"}
+  D -->|"yes"| E["mandate + Copilot notes<br>+ checked role lines from the sheet"]
+  D -->|"no"| F["mandate + Copilot notes<br>+ 'run setup-pstack first'"]
+  E --> G["Injected as the EXTREMELY_IMPORTANT<br>block in the session context"]
+  F --> G
+  </pre>
+
+  <p>So the block you see is <em>assembled text</em>, concatenated from three
+  markdown parts in the <code>hooks\</code> folder:</p>
+  <pre><code>session-start.ps1
+  reads  session-start-context.md       → "Invoke poteto-mode when…" (the mandate)
+  reads  session-start-copilot.md       → Copilot translation rules (bare names,
+                                          copilot-tools.md, "don't view the sheet")
+  if sheet valid:
+      reads session-start-copilot-sheet.md  → "these are your saved model choices:"
+      appends validated role lines from pstack-models.md
+  else:
+      reads session-start-copilot-setup.md  → "run setup-pstack before dispatching"
+  prints the result  → Copilot injects it into the session context</code></pre>
+  <p>Two demystifying details: the script validates your sheet against the
+  plugin's <code>models.json</code> and refuses to quote unchecked sheet text
+  into your context (a prompt-injection guard). And the plugin's second hook,
+  <code>PreToolUse</code>, is defined as <code>"powershell": "exit 0"</code> —
+  on Windows it is literally a no-op; only the Unix variant runs a real
+  check.</p>
+
+  <h2>3 · The model sheet: role lines → <code>task</code> parameters</h2>
+  <p>Ten pstack skills (<code>poteto-mode</code>, <code>architect</code>,
+  <code>arena</code>, <code>how</code>, <code>why</code>, <code>swarm</code>…)
+  dispatch subagents by <em>role</em>. The sheet maps each role to a model, and
+  the hook turns each line into an instruction for the agent-spawning
+  <code>task</code> tool:</p>
+  <pre><code>for each role line in pstack-models.md:
+  "architect runners: claude-opus-5.5"   → task(model: "claude-opus-5.5")
+  "bug-fix: inherit-parent"              → task()        # omit model: use session model
+  "hillclimb: auto"                      → task()        # same: let the harness pick</code></pre>
+  <p>Your current sheet sets <strong>every role to
+  <code>inherit-parent</code></strong> with <code>default effort: session</code>.
+  Translation: the entire model-dispatch machinery is currently a
+  <em>pass-through</em> — every subagent runs on whatever model your session
+  uses. The sheet changes nothing today; it is an empty saddle waiting for you
+  to pin specific models per role (e.g. a cheap model for swarm workers, a
+  strong one for judgment).</p>
+
+  <h2>4 · What the mandate actually routes</h2>
+  <p>The mandate is narrower than its shouty tag suggests. It fires
+  <code>poteto-mode</code> only for: multi-file changes or signature changes
+  others call, design/architecture choices, unknown-cause bugs, and perf
+  issues. Small contained tasks stay direct. From there,
+  <code>poteto-mode</code> is a <em>router</em>:</p>
+  <pre><code>poteto-mode
+  classifies the task
+    feature / refactoring  → playbook + architect, how, tdd…
+    bug-fix                → why (root cause) → focused fix
+    perf-issue             → benchmark-checklist, explain-the-number
+  grounds decisions in 24 principle-* leaf skills
+  spawns subagents via pstack:poteto-agent (models per sheet role)</code></pre>
+  <p>And one line in <code>session-start-context.md</code> is your lever:
+  <em>“User instructions (CLAUDE.md, AGENTS.md, direct requests) take
+  precedence.”</em> On Copilot, <code>~\.copilot\copilot-instructions.md</code>
+  and <code>.github\copilot-instructions.md</code> count as user instructions
+  too. The mandate is a default, not a law.</p>
+
+  <h2>5 · Your three switches</h2>
+  <table>
+    <tr><th>Option</th><th>How</th><th>Effect</th></tr>
+    <tr>
+      <td>Keep as-is</td>
+      <td>Do nothing</td>
+      <td>Router fires on qualifying tasks; ~70 skills stay; sheet is a
+      pass-through</td>
+    </tr>
+    <tr>
+      <td>Reconfigure</td>
+      <td>Edit <code>pstack-models.md</code> or rerun
+      <code>setup-pstack</code></td>
+      <td>Pin real models per role; machinery starts doing something</td>
+    </tr>
+    <tr>
+      <td>Mute the router, keep the toolbox</td>
+      <td>One line in <code>~\.copilot\copilot-instructions.md</code>
+      (user instructions outrank the mandate)</td>
+      <td>No auto-routing; every pstack skill stays invocable by name</td>
+    </tr>
+    <tr>
+      <td>Remove entirely</td>
+      <td>Flip the enable flag:</td>
+      <td>No hook, no mandate — and no pstack skills or agents either; they
+      all live in the same plugin folder</td>
+    </tr>
+  </table>
+  <pre><code class="language-diff"> ~\.copilot\settings.json
+-  "pstack@pstack-claude": true
++  "pstack@pstack-claude": false</code></pre>
+  <p>The key coupling to remember: <strong>the mandate and the skills cannot be
+  separated at the plugin level</strong> — hooks and skills ship together.
+  Separating them is only possible from above, via user instructions. Hold the
+  final decision until you have run <code>poteto-mode</code> on a real task
+  (the upcoming experiment lesson); deciding before evidence would be exactly
+  the cargo-culting this mission exists to end.</p>
+
+  <div class="try">
+    <ol>
+      <li>Read the hook registration yourself (30 seconds, it's short):
+        <pre><code>Get-Content ~\.copilot\installed-plugins\pstack-claude\pstack\hooks\copilot-hooks.json</code></pre>
+        Find the <code>matcher</code> and the Windows <code>PreToolUse</code>
+        no-op.</li>
+      <li>Open <code>hooks\session-start-context.md</code> next to it and
+        compare with the top of any fresh session's injected block — same
+        text, now unmysterious.</li>
+      <li>In a fresh session, ask the agent: <em>“quote the role lines at the
+        end of your pstack block”</em> — confirm they match your sheet's
+        <code>inherit-parent</code> rows without the agent reading the
+        sheet.</li>
+    </ol>
+  </div>
+
+  <h2>Check yourself</h2>
+  <div id="quiz"></div>
+
+  <div class="source">
+    The hooks folder itself:
+    <code>~\.copilot\installed-plugins\pstack-claude\pstack\hooks\</code> —
+    ground truth, and surprisingly readable. Pair it with
+    <a href="https://docs.github.com/en/copilot/concepts/customizations/hooks">GitHub
+    Docs: Hooks for Copilot</a> for what hooks are, and the
+    <a href="https://github.com/michael-denyer/pstack-claude">pstack-claude
+    repo</a> for why the fork exists.
+  </div>
+
+  <div class="teacher">
+    Ask your agent-teacher follow-up questions any time — e.g. “show me your
+    injected pstack block verbatim”, or “draft the one-line instruction that
+    would mute the router”. Both are safe, reversible experiments.
+  </div>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Previous: <a href="0001-skill-discovery-and-loading.html">Lesson 0001 — skill discovery &amp; loading</a></li>
+      <li>Next: Lesson 0003 — provider philosophies compared (planned)</li>
+      <li>Reference: <a href="../reference/0002-pstack-machinery-map.html">pstack machinery map</a></li>
+      <li>Workspace: <a href="../index.html">Index</a> · <a href="../GLOSSARY.md">Glossary</a> · <a href="../MISSION.md">Mission</a></li>
+    </ul>
+  </nav>
+</main>
+
+<script src="../assets/quiz.js"></script>
+<script src="../assets/mermaid.js"></script>
+<script>
+renderQuiz("quiz", [
+  {
+    q: "How does the poteto-mode mandate get into every session?",
+    answers: [
+      "A SessionStart hook injects it",
+      "The skill tool preloads it",
+      "The model sheet contains it",
+    ],
+    correct: 0,
+    explain: "copilot-hooks.json matches startup|resume|clear|compact and runs session-start.ps1, which prints the assembled block (section 2).",
+  },
+  {
+    q: "Your sheet sets every role to inherit-parent. What does that mean for subagents?",
+    answers: [
+      "Subagents run on cheaper fast models",
+      "Subagents run on separate pstack models",
+      "Subagents run on the session model",
+    ],
+    correct: 2,
+    explain: "inherit-parent omits the task tool's model parameter, so the whole dispatch machinery is currently a pass-through (section 3).",
+  },
+  {
+    q: "You flip the settings.json flag to false. What disappears?",
+    answers: [
+      "Mandate stays until the sheet updates",
+      "Mandate, hooks, and skills all together",
+      "Hooks only, while the skills remain",
+    ],
+    correct: 1,
+    explain: "Hooks and skills ship in one plugin folder; the enable flag governs all of it — that coupling is the crux of the decision (section 5).",
+  },
+  {
+    q: "The mandate conflicts with your AGENTS.md. Which side wins?",
+    answers: [
+      "The plugin mandate overrides user files",
+      "The newest instruction wins the conflict",
+      "User instructions take precedence over it",
+    ],
+    correct: 2,
+    explain: "The mandate says so itself in session-start-context.md — which is why a one-line user instruction can mute the router (section 4).",
+  },
+]);
+</script>
+</body>
+</html>

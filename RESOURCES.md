@@ -9,6 +9,10 @@
 - [GitHub Docs: Adding agent skills](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills)
   How-to for installing skills, incl. the cloud coding agent. Use for:
   per-surface setup differences.
+- [GitHub Docs: Hooks for Copilot](https://docs.github.com/en/copilot/concepts/customizations/hooks)
+  and the [hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference).
+  Official lifecycle-hook docs (SessionStart, PreToolUse…). Use for: any
+  claim about how hook registration and execution work (lesson 0002).
 - [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (117k★)
   25 production-engineering-practice skills (TDD, debugging, context
   engineering…). Browsable index at [skills.addy.ie](https://skills.addy.ie).

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference · pstack machinery map</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference 0002 · AI agent skills for GitHub Copilot</p>
+  <h1>pstack machinery map</h1>
+  <p class="lede">Every pstack behavior, traced to its file and its switch.
+  Compressed from <a href="../lessons/0002-pstack-demystified.html">lesson
+  0002</a>.</p>
+
+  <h2>Artifacts</h2>
+  <pre><code>~\.copilot\
+├── settings.json                  "pstack@pstack-claude": true   ← enable flag (ALL of pstack)
+├── pstack-models.md               role → model sheet             ← only file setup-pstack wrote
+└── installed-plugins\pstack-claude\pstack\
+    ├── skills\                    ~70 skills
+    ├── agents\                    pstack:poteto-agent, pstack:comment-sicko…
+    ├── models.json                legal roles + efforts (validates the sheet)
+    └── hooks\
+        ├── copilot-hooks.json     hook registration
+        ├── session-start.ps1/.sh  assembles the injected block
+        ├── session-start-context.md       the mandate text
+        ├── session-start-copilot.md       Copilot translation rules
+        ├── session-start-copilot-sheet.md preamble for valid-sheet role lines
+        └── session-start-copilot-setup.md fallback: "run setup-pstack"</code></pre>
+
+  <h2>Hook flow (every session start)</h2>
+  <pre><code>SessionStart (matcher: startup|resume|clear|compact)
+  session-start.ps1 copilot          # .sh on Unix
+    + session-start-context.md       # mandate
+    + session-start-copilot.md       # Copilot notes
+    + sheet valid against models.json?
+        yes → session-start-copilot-sheet.md + checked role lines
+        no  → session-start-copilot-setup.md
+  → printed → injected as the EXTREMELY_IMPORTANT block
+
+PreToolUse (matcher: view|task|bash)
+  Windows: "exit 0"                  # no-op
+  Unix:    pre-tool-use.sh           # real check, 5s timeout</code></pre>
+
+  <h2>Sheet syntax</h2>
+  <pre><code>&lt;role&gt;: &lt;model-id | inherit-parent | auto&gt;[, more…][ @&lt;effort&gt;]
+default effort: &lt;session | level&gt;
+
+inherit-parent / auto  → task() omits model      (subagent = session model)
+model-id               → task(model: "model-id")
+invalid sheet          → no role lines injected; setup fallback instead</code></pre>
+  <p>Skills that dispatch on role models: <code>architect</code>,
+  <code>arena</code>, <code>how</code>, <code>interrogate</code>,
+  <code>no-comments</code>, <code>poteto-mode</code>, <code>reflect</code>,
+  <code>swarm</code>, <code>thermos</code>, <code>why</code>.</p>
+
+  <h2>Mandate scope</h2>
+  <pre><code>poteto-mode fires when ANY of:
+  multi-file change, or signature change other files call
+  design / architecture choice
+  bug with unknown cause, or perf issue
+otherwise: work directly
+
+precedence: user instructions &gt; mandate
+  (CLAUDE.md, AGENTS.md, direct requests,
+   ~\.copilot\copilot-instructions.md, .github\copilot-instructions.md)</code></pre>
+
+  <h2>Switches</h2>
+  <table>
+    <tr><th>Goal</th><th>Switch</th></tr>
+    <tr><td>Remove everything (mandate + skills + agents)</td>
+        <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
+    <tr><td>Mute router, keep skills invocable</td>
+        <td>Override line in <code>~\.copilot\copilot-instructions.md</code></td></tr>
+    <tr><td>Pin models per role</td>
+        <td>Edit <code>~\.copilot\pstack-models.md</code> or rerun <code>setup-pstack</code></td></tr>
+    <tr><td>Current state (2026-11-16)</td>
+        <td>All roles <code>inherit-parent</code>, effort <code>session</code> — pure pass-through</td></tr>
+  </table>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Lesson: <a href="../lessons/0002-pstack-demystified.html">0002 — pstack demystified</a></li>
+      <li>Related: <a href="0001-skill-discovery-cheatsheet.html">Skill discovery cheat sheet</a></li>
+      <li>Docs: <a href="https://docs.github.com/en/copilot/concepts/customizations/hooks">Hooks for Copilot</a> · <a href="https://docs.github.com/en/copilot/reference/hooks-reference">Hooks reference</a></li>
+    </ul>
+  </nav>
+</main>
+</body>
+</html>

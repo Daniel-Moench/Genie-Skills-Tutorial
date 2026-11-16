@@ -8,12 +8,16 @@
 - Wants hands-on experiments, short lessons.
 - Target surfaces: VSCode, IntelliJ, Copilot Desktop App, Copilot CLI.
 - End goal is a decision: which skills to keep and how to configure them.
+- Wants show-me-style visuals in lessons (file trees, call trees, Mermaid
+  flow diagrams) — requested via `/show-me`, 2026-11-16. Reusable loader:
+  `assets/mermaid.js`.
 
 ## Standing decisions
 
 - **pstack setup stays as-is for now** (sheet `~\.copilot\pstack-models.md`,
-  all roles `inherit-parent`, `session hook: on`). A dedicated lesson will
-  demystify it; Daniel decides keep/remove/reconfigure afterwards.
+  all roles `inherit-parent`, `session hook: on`). Lesson 0002 delivered the
+  demystification; the keep/remove/reconfigure decision is deferred until
+  after the hands-on poteto-mode experiment (backlog item 5).
 - Lessons in English.
 
 ## Environment facts (verified 2026-11-13)
@@ -29,6 +33,8 @@
 ## Planned repo structure
 
 - `lessons/` `reference/` `learning-records/` `assets/` — teach-skill layout.
+- `index.html` — GitHub Pages entry point; update its lesson/reference tables
+  whenever a new lesson or cheat sheet lands.
 - `experiments/` — created lazily when the first hands-on experiment with a
   skill produces artifacts worth keeping.
 - `docs/agents/` — pre-existing agent conventions (issue tracker, triage).
@@ -36,7 +42,8 @@
 ## Lesson backlog (rough ZPD order)
 
 1. ✔ Skill discovery & loading mechanics (0001)
-2. pstack demystified: poteto-mode, hooks, model sheet → removal decision
+2. ✔ pstack demystified: poteto-mode, hooks, model sheet (0002) — decision
+   itself deferred to after item 5
 3. Provider philosophies compared: addyosmani vs pstack vs humanlayer vs
    mattpocock (routing map: which provider for which job)
 4. Experiment: humanlayer `rpi` end-to-end on a toy task
