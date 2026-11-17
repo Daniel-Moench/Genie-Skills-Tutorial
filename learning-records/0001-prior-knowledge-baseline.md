@@ -13,3 +13,7 @@ not mechanics.
 - mattpocock/skills serve as the comparison baseline in provider lessons.
 - The pstack setup is the single biggest stated confusion → highest-value
   early lesson target.
+
+---
+
+[Course index](../index.html)

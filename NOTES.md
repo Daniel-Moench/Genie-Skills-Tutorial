@@ -54,3 +54,7 @@
 6. Combining providers: collisions (3× TDD), layering, custom routing
 7. Per-surface behavior: CLI vs VSCode vs IntelliJ vs Desktop App
 8. Final curation: choose the set, write the config, document it
+
+---
+
+[Course index](index.html)

@@ -31,3 +31,7 @@ files, including the awk engine.
   (more prompts, advisory-only sheet enforcement).
 - Lesson 0002's quiz outcome not yet reported; the keep/remove/reconfigure
   decision still waits for the poteto-mode experiment (backlog item 5).
+
+---
+
+[Course index](../index.html)

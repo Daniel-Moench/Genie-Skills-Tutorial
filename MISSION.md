@@ -33,3 +33,7 @@ of a cargo-culted setup whose hooks and files are a mystery.
 - Authoring new skills from scratch (revisit after the curation decision).
 - Non-Copilot harness mechanics (Claude Code hooks, Cursor rules, etc.),
   except where needed to understand what a provider translated for Copilot.
+
+---
+
+[Course index](index.html)

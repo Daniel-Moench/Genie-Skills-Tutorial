@@ -63,3 +63,7 @@
   against CLI docs/changelog.
 - Per-surface differences (IntelliJ vs Desktop App vs VSCode) are thinly
   documented → drive these via experiments, record results in lessons.
+
+---
+
+[Course index](index.html)

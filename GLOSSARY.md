@@ -24,3 +24,7 @@ _Avoid_: lazy loading, preloading
 A skill's `description` field, which the model matches against the task to
 decide automatic invocation — the cause of provider collisions.
 _Avoid_: summary, docstring
+
+---
+
+[Course index](index.html)
