@@ -54,7 +54,8 @@ sheet enforcement is advisory only.</code></pre>
     <tr><th>Goal</th><th>Switch</th></tr>
     <tr><td>Remove everything (mandate + skills + agents)</td>
         <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
-    <tr><td>Stop the mandate, keep skills (native)</td>
+    <tr><td>Stop the mandate, keep skills (plugin-native: the hook still
+        fires, pstack's script reads the line and prints nothing)</td>
         <td><code>session hook: off</code> in <code>~\.copilot\pstack-models.md</code></td></tr>
     <tr><td>Soften the mandate, keep skills (override)</td>
         <td>Line in <code>~\.copilot\copilot-instructions.md</code></td></tr>

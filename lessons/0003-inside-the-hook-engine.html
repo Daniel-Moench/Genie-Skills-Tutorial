@@ -155,18 +155,21 @@ flowchart TD
   losing the skills was a user-instruction override. Reading
   <code>session-start.sh</code> disproves that: the script checks your sheet
   for a <code>session hook:</code> line before assembling anything
-  (<code>session-start.ps1</code> mirrors it).</p>
+  (<code>session-start.ps1</code> mirrors it, line 137).</p>
   <pre><code> ~\.copilot\pstack-models.md
 -session hook: on
 +session hook: off     ← hook prints nothing; no mandate injected</code></pre>
-  <p>This is a <em>native</em> off-switch: the plugin stays enabled, all ~70
+  <p>This is a <em>plugin-native</em> off-switch — native to pstack, not to
+  Copilot. Copilot still fires the SessionStart hook every session; the
+  plugin's own script reads the line and exits printing nothing, and empty
+  output means nothing is injected. The plugin stays enabled, all ~70
   skills and the agents stay invocable by name, only the injected block
   disappears. Your updated switch table:</p>
   <table>
     <tr><th>Goal</th><th>Switch</th></tr>
     <tr><td>Remove everything</td>
         <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
-    <tr><td>Stop the mandate, keep skills (native)</td>
+    <tr><td>Stop the mandate, keep skills (plugin-native)</td>
         <td><code>session hook: off</code> in <code>pstack-models.md</code></td></tr>
     <tr><td>Soften the mandate, keep skills (override)</td>
         <td>Line in <code>~\.copilot\copilot-instructions.md</code></td></tr>
