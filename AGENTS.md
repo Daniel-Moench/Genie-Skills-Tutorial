@@ -15,14 +15,17 @@ This repository uses a single-context layout. See `docs/agents/domain.md`.
 ## Workspace work
 
 - See `MISSION.md` for the workspace purpose.
-- For this purpose, use skill `/mattpocock-skills:teach` (resolve explicitly via `~/.copilot/installed-plugins/mattpocock/mattpocock-skills/skills/productivity/teach/SKILL.md` + references), always deepened by skill `/pstack:teach` and `/show-me` (resolve explicitly via `~/.copilot/installed-plugins/skills/show-me/skills/show-me/SKILL.md`). If any not available, abort and report.
-- Continuously improve workspace structure as it evolves. Don't refrain from restructurings when necessary to maintain clarity and efficiency.
-- Use proper sub-directories for project exercises or other hands-on activities.
-- For HTML:
-  - The HTMLs are served via Github Pages @ https://daniel-moench.github.io/Genie-Skills-Tutorial/ against the "main" branch.
+  - For this purpose, use skill `/mattpocock-skills:teach` (resolve explicitly via `~/.copilot/installed-plugins/mattpocock/mattpocock-skills/skills/productivity/teach/SKILL.md` + references), always deepened by skill `/pstack:teach` and `/show-me` (resolve explicitly via `~/.copilot/installed-plugins/skills/show-me/skills/show-me/SKILL.md`). If any not available, abort and report.
+- Continuously improve and extend workspace structure and tooling as it evolves. Don't refrain from restructurings when necessary to maintain clarity and efficiency.
+  - Use proper sub-directories for project exercises or other hands-on activities.
+- For HTML/assets:
+  - Webpages are served via "Github Pages" @ https://daniel-moench.github.io/Genie-Skills-Tutorial/ against the "main" branch.
   - Continuously update `index.html`. Documents should include navigation back to it.
   - Use wide-screen layouts, optimize for 2560x1440.
-  - Verify new or changed HTML via browser tools or Playwright MCP (with given resolution for canvas + windows). Delete its `.playwright-mcp/` scratch folder after successful verification. Validate style changes and visuals - like tables, graphs etc. - via screenshots.
+  - Review gate before publishing HTML/asset changes:
+    1. **Critique:** On a sub-agent with the strongest model on clean context, apply the skills above to concept progression; then run a review via `/impeccable critique <path>` in Read mode.
+    2. **Audit:** On a sub-agent with the strongest model on clean context, run a review via `/impeccable audit <path>`. Inspect rendered screenshots via browser tools or Playwright MCP at `2560x1440` and `390x844` (canvas and window).
+    3. **Close:** Fix findings and confirm affected views. It is OK to adapt shared assets so general improvements are reflected over the whole workspace. Record evidence and any explicitly deferred findings in the PR; delete `.playwright-mcp/` after successful verification.
 
 ## Git
 
