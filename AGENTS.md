@@ -15,19 +15,22 @@ This repository uses a single-context layout. See `docs/agents/domain.md`.
 ## Workspace work
 
 - See `MISSION.md` for the workspace purpose.
-- For this purpose, use skill `/mattpocock-skills:teach` (resolve explicitly via `~/.copilot/installed-plugins/mattpocock/mattpocock-skills/skills/productivity/teach/SKILL.md` + references), always deepened by skill `/pstack:teach` and `/show-me` (resolve explicitly via `~/.copilot/installed-plugins/skills/show-me/skills/show-me/SKILL.md`). If any not available, abort and report.
-- Continuously improve workspace structure as it evolves. Don't refrain from restructurings when necessary to maintain clarity and efficiency.
-- Use proper sub-directories for project exercises or other hands-on activities.
-- For HTML:
-  - The HTMLs are served via Github Pages @ https://daniel-moench.github.io/Genie-Skills-Tutorial/ against the "main" branch.
+  - For this purpose, use skill `/mattpocock-skills:teach` (resolve explicitly via `~/.copilot/installed-plugins/mattpocock/mattpocock-skills/skills/productivity/teach/SKILL.md` + references), always deepened by skill `/pstack:teach` and `/show-me` (resolve explicitly via `~/.copilot/installed-plugins/skills/show-me/skills/show-me/SKILL.md`). If any not available, abort and report.
+- Continuously improve and extend workspace structure and tooling as it evolves. Don't refrain from restructurings when necessary to maintain clarity and efficiency.
+  - Use proper sub-directories for project exercises or other hands-on activities.
+- For HTML/assets:
+  - Webpages are served via "Github Pages" @ https://daniel-moench.github.io/Genie-Skills-Tutorial/ against the "main" branch.
   - Continuously update `index.html`. Documents should include navigation back to it.
   - Use wide-screen layouts, optimize for 2560x1440.
-  - Verify new or changed HTML via browser tools or Playwright MCP (with given resolution for canvas + windows). Delete its `.playwright-mcp/` scratch folder after successful verification. Validate style changes and visuals - like tables, graphs etc. - via screenshots.
+  - Review gate before publishing HTML/asset changes:
+    1. **Critique:** On a sub-agent with the strongest model on clean context, apply the skills above to concept progression; then run a review via `/impeccable critique <path>` in Read mode.
+    2. **Audit:** On a sub-agent with the strongest model on clean context, run a review via `/impeccable audit <path>`. Inspect rendered screenshots via browser tools or Playwright MCP at `2560x1440` and `390x844` (canvas and window).
+    3. **Close:** Fix findings and confirm affected views. It is OK to adapt shared assets so general improvements are reflected over the whole workspace. Record evidence and any explicitly deferred findings in the PR; delete `.playwright-mcp/` after successful verification.
 
 ## Git
 
 - Do all work on feature branches and push those branches. You can use worktrees, but only when necessary for parallel work or isolated testing.
-- `main` moves only through pull requests that you create (fast-forward mode). Provide clickable links for the PRs in your output and open them in the system browser.
+- `main` moves only through pull requests that you create (fast-forward mode). Use `/visual-pr` to generate and manage pull requests (omit generating `description.md`/`pr-description.md`). Provide clickable links for the PRs in your user-facing output and open them in the system browser.
 - Conventional Commits, at least one commit per ticket (e.g. `feat: scaffold Gradle project`, `fix: the wrong behavior XYZ`). Keep it concise. Add rationale about _why_ a change was made in the commit message. Use markdown syntax. Wrap comment lines at 80 chars - for soft-wraps, use trailing `  `-syntax, not `/`. Quote artifact names & references with `backticks`. Use bullet-list(s) for structure. For inline references to related tickets, use "#123"-style. Finish with fully-qualified Github reference(s) of the processed ticket number(s) and title(s). Example:
 
   ```txt
