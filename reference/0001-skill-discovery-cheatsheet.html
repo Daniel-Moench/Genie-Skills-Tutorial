@@ -12,19 +12,23 @@
   <h1>Skill discovery cheat sheet</h1>
 
   <h2>Discovery tiers</h2>
+  <div class="table-scroll" role="region" aria-label="Discovery tiers" tabindex="0">
   <table>
     <tr><th>Tier</th><th>Path</th><th>Scope</th></tr>
     <tr><td>Personal</td><td><code>~\.copilot\skills\</code> · <code>~\.agents\skills\</code> · <code>~\.claude\skills\</code></td><td>User-wide</td></tr>
     <tr><td>Repository</td><td><code>.github\skills\</code> · <code>.agents\skills\</code> · <code>.claude\skills\</code></td><td>Repo-wide</td></tr>
     <tr><td>Plugin</td><td><code>~\.copilot\installed-plugins\&lt;marketplace&gt;\&lt;plugin&gt;\skills\</code></td><td>User-wide</td></tr>
   </table>
+  </div>
 
   <h2>Wiring files</h2>
+  <div class="table-scroll" role="region" aria-label="Wiring files" tabindex="0">
   <table>
     <tr><th>File</th><th>Holds</th></tr>
     <tr><td><code>~\.copilot\config.json</code></td><td>Marketplace registrations (source repos of plugins)</td></tr>
     <tr><td><code>~\.copilot\settings.json</code></td><td>Plugin enable flags, e.g. <code>"pstack@pstack-claude": true</code></td></tr>
   </table>
+  </div>
 
   <h2>Loading model</h2>
   <ul>
@@ -41,6 +45,7 @@
   </ol>
 
   <h2>This machine (verified 2026-11-13)</h2>
+  <div class="table-scroll" role="region" aria-label="This machine (verified 2026-11-13)" tabindex="0">
   <table>
     <tr><th>Provider</th><th>Install dir under <code>installed-plugins\</code></th><th>Skills</th><th>Flagship</th></tr>
     <tr><td>addyosmani/agent-skills</td><td><code>addy-agent-skills\agent-skills</code></td><td>25</td><td>engineering-practice playbooks</td></tr>
@@ -49,6 +54,7 @@
     <tr><td>humanlayer/skills</td><td><code>skills\&lt;skill-name&gt;</code></td><td>7</td><td><code>rpi</code> (research→plan→implement)</td></tr>
     <tr><td>direct installs</td><td><code>_direct\…</code></td><td>1</td><td>ai-prompt-engineering-safety-review</td></tr>
   </table>
+  </div>
 
   <h2>Known collisions</h2>
   <p><code>tdd</code> (mattpocock) · <code>tdd</code> (pstack) ·

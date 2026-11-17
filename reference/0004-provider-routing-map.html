@@ -8,18 +8,46 @@
 </head>
 <body>
 <main>
+  <nav class="page-nav" aria-label="Course">
+    <a href="../index.html">Back to course index</a>
+    <a href="../lessons/0004-provider-philosophies-compared.html">Lesson 0004</a>
+  </nav>
   <p class="kicker">Reference 0004 · AI agent skills for GitHub Copilot</p>
   <h1>Provider routing map</h1>
-  <p class="lede">Four providers, one axis, one routing table. From
+  <p class="lede">Four providers, one control axis, one continuity lane, one
+  routing table. From
   <a href="../lessons/0004-provider-philosophies-compared.html">lesson 0004</a>.</p>
 
-  <h2>The control axis</h2>
-  <pre><code>you own the process ──────────────────────────────▶ the plugin owns the process
-
-mattpocock          addyosmani            humanlayer              pstack
-39 hand tools       25 playbooks +        7 skills; documents     67 skills; injected
-you route           a meta-skill map      own the process,        mandate routes to
-                    that suggests         fresh session/phase     playbooks + panels</code></pre>
+  <h2 id="axis">Control axis and continuity lane</h2>
+  <figure class="visual">
+    <figcaption>Who selects the workflow? How does work survive a fresh context window?</figcaption>
+    <ul class="control-axis">
+      <li class="provider-mattpocock">
+        <strong class="provider-name">mattpocock</strong>
+        <p>39 hand tools. You pick and compose.</p>
+      </li>
+      <li class="provider-addyosmani">
+        <strong class="provider-name">addyosmani</strong>
+        <p>25 playbooks. <code>using-agent-skills</code> suggests a phase map.</p>
+      </li>
+      <li class="provider-pstack">
+        <strong class="provider-name">pstack</strong>
+        <p>67 skills. An injected mandate routes through <code>poteto-mode</code>.</p>
+      </li>
+    </ul>
+    <div class="axis-scale"><span>You select each tool</span><span>A workflow driver selects tools</span></div>
+    <div class="document-lane provider-humanlayer">
+      <strong class="provider-name">humanlayer · 7 skills · <code>rpi</code> document phases</strong>
+      <ol class="flow-steps">
+        <li><strong>Research</strong><small>Write findings</small></li>
+        <li><strong>Design</strong><small>Write a PRD, TDD, or both</small></li>
+        <li><strong>Outline</strong><small>Write the structure</small></li>
+        <li><strong>Implement</strong><small>Read the artifacts</small></li>
+      </ol>
+      <p class="figure-note">A fresh context window per phase. Here, TDD means
+      Technical Design Document.</p>
+    </div>
+  </figure>
 
   <h2>One-liners (evidenced)</h2>
   <pre><code>addyosmani   "Skills are workflows, not suggestions."     (using-agent-skills\SKILL.md)
@@ -31,9 +59,11 @@ humanlayer   "Documents Carry Context Between Sessions";
 mattpocock   "small, easy to adapt, and composable" vs frameworks that
              "take away your control"                       (README.md)</code></pre>
 
-  <h2>Routing table</h2>
+  <h2 id="routing">Routing table</h2>
+  <div class="table-scroll" role="region" aria-label="Routing table" tabindex="0">
   <table>
-    <tr><th>The job</th><th>Reach for</th></tr>
+    <thead><tr><th scope="col">The job</th><th scope="col">Reach for</th></tr></thead>
+    <tbody>
     <tr><td>Discipline question mid-task (debug / harden / optimize / ship / CI)</td>
         <td>addyosmani playbook (<code>debugging-and-error-recovery</code>,
         <code>security-and-hardening</code>, <code>performance-optimization</code>,
@@ -49,7 +79,9 @@ mattpocock   "small, easy to adapt, and composable" vs frameworks that
         <td>pstack <code>principle-*</code> (24 single-rule leaves)</td></tr>
     <tr><td>Quick visual explanation</td>
         <td>humanlayer <code>show-me</code></td></tr>
+    </tbody>
   </table>
+  </div>
 
   <h2>Collision domains (route by name, not auto-invocation)</h2>
   <pre><code>test-first coding   addy test-driven-development · pstack tdd · mattpocock tdd
@@ -69,8 +101,10 @@ scheduled agent loops  humanlayer build-iterated-agentic-loop / design-control-l
 one-rule principles    pstack principle-* only</code></pre>
 
   <h2>Shapes at a glance</h2>
-  <table>
-    <tr><th></th><th>addyosmani</th><th>pstack</th><th>humanlayer</th><th>mattpocock</th></tr>
+  <div class="table-scroll" role="region" aria-label="Shapes at a glance" tabindex="0">
+  <table class="comparison-table">
+    <thead><tr><th scope="col"><span class="visually-hidden">Attribute</span></th><th scope="col">addyosmani</th><th scope="col">pstack</th><th scope="col">humanlayer</th><th scope="col">mattpocock</th></tr></thead>
+    <tbody>
     <tr><td>Skills on disk</td><td>25</td><td>67 (+1 grok slice)</td><td>7</td><td>39</td></tr>
     <tr><td>Structure</td><td>flat playbooks</td>
         <td>12 drivers · 24 principles · 29 utilities · 2 meta</td>
@@ -86,7 +120,9 @@ one-rule principles    pstack principle-* only</code></pre>
         <td>no</td><td>no</td></tr>
     <tr><td>Token appetite</td><td>low–mid</td><td>high, by design</td>
         <td>mid (fresh sessions)</td><td>low</td></tr>
+    </tbody>
   </table>
+  </div>
 
   <nav class="lesson-nav">
     <ul>

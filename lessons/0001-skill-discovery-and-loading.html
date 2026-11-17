@@ -24,6 +24,7 @@
   <p>Copilot looks for skills in three kinds of places
   (<a href="https://docs.github.com/en/copilot/concepts/customizations/agent-skills">official
   docs</a>):</p>
+  <div class="table-scroll" role="region" aria-label="Three discovery tiers" tabindex="0">
   <table>
     <tr><th>Tier</th><th>Location</th><th>Scope</th></tr>
     <tr>
@@ -42,6 +43,7 @@
       <td>You, every project</td>
     </tr>
   </table>
+  </div>
   <p>All four of your providers arrived through tier 3. On your machine:</p>
   <pre><code>~\.copilot\installed-plugins\
 ├── addy-agent-skills\agent-skills\skills\      25 skills
@@ -70,6 +72,7 @@
   exactly (by you, or by another skill).</p>
 
   <h2>3 · Three ways a skill fires</h2>
+  <div class="table-scroll" role="region" aria-label="Three ways a skill fires" tabindex="0">
   <table>
     <tr><th>Path</th><th>Who triggers</th><th>Example</th></tr>
     <tr>
@@ -90,6 +93,7 @@
       <code>architect</code>, … by name</td>
     </tr>
   </table>
+  </div>
   <p>Consequence: the <code>description</code> field is not documentation —
   it is the <em>trigger surface</em>. That's why good providers write them as
   “Use when…” rules. When you later curate your set, badly written

@@ -64,6 +64,7 @@
   machine with zero installed dependencies — no Python, no Node, no jq. The
   only scripting languages POSIX guarantees on every Unix are <code>sh</code>
   and <code>awk</code>. So the author built the tooling from exactly those:</p>
+  <div class="table-scroll" role="region" aria-label="Why awk, of all things" tabindex="0">
   <table>
     <tr><th>File</th><th>Role</th></tr>
     <tr><td><code>json.awk</code></td>
@@ -81,6 +82,7 @@
     <tr><td><code>muse-context.awk</code>, <code>agy-context.awk</code></td>
         <td>The same assembler, re-targeted at Muse and Antigravity</td></tr>
   </table>
+  </div>
   <p>On Windows there is no POSIX guarantee, so the author wrote one
   PowerShell twin for the session-start path (<code>session-start.ps1</code>)
   — and, crucially, <em>did not</em> port the tool gate. More on that in
@@ -117,6 +119,7 @@ flowchart TD
   tool calls (<code>view</code>, <code>task</code>, <code>bash</code>). On
   Unix, <code>pre-tool-use.sh</code> + the two awk files return one of three
   verdicts:</p>
+  <div class="table-scroll" role="region" aria-label="The tool gate Windows doesn't have" tabindex="0">
   <table>
     <tr><th>Tool call</th><th>Verdict</th><th>Why</th></tr>
     <tr><td><code>view</code> of files inside the plugin folder</td>
@@ -135,6 +138,7 @@ flowchart TD
         <td>silent</td>
         <td>No output = fall through to the normal permission flow</td></tr>
   </table>
+  </div>
   <p>And on Windows? The registration says <code>"powershell": "exit 0"</code>.
   That is not laziness — it is the only safe choice. The gate engine is
   written in sh + awk, which Windows does not guarantee, and in Copilot's hook
@@ -165,6 +169,7 @@ flowchart TD
   output means nothing is injected. The plugin stays enabled, all ~70
   skills and the agents stay invocable by name, only the injected block
   disappears. Your updated switch table:</p>
+  <div class="table-scroll" role="region" aria-label="Correction: there is a fourth switch" tabindex="0">
   <table>
     <tr><th>Goal</th><th>Switch</th></tr>
     <tr><td>Remove everything</td>
@@ -176,6 +181,7 @@ flowchart TD
     <tr><td>Pin models per role</td>
         <td>Edit the sheet or rerun <code>setup-pstack</code></td></tr>
   </table>
+  </div>
   <p>Lesson 2 and its reference sheet have been corrected accordingly. The
   difference between the two middle rows: <code>session hook: off</code>
   removes the block entirely (the agent never hears about poteto-mode), while

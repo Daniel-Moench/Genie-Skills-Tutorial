@@ -12,11 +12,18 @@
   var s = document.createElement("script");
   s.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
   s.onload = function () {
-    mermaid.initialize({
+    var config = {
       startOnLoad: true,
       theme: "neutral",
       themeVariables: { fontFamily: "Consolas, Menlo, monospace" },
+    };
+    // Render at natural size: never stretch to the column, and let wide
+    // diagrams scroll inside their block instead of shrinking (course.css).
+    ["flowchart", "sequence", "class", "state", "er", "gantt", "journey",
+     "pie", "mindmap", "timeline", "gitGraph"].forEach(function (type) {
+      config[type] = { useMaxWidth: false };
     });
+    mermaid.initialize(config);
   };
   document.head.appendChild(s);
 })();

@@ -8,6 +8,10 @@
 </head>
 <body>
 <main>
+  <nav class="page-nav" aria-label="Course">
+    <a href="../index.html">Back to course index</a>
+    <a href="../reference/0004-provider-routing-map.html">Provider routing reference</a>
+  </nav>
   <p class="kicker">Lesson 0004 · AI agent skills for GitHub Copilot</p>
   <h1>Provider philosophies compared</h1>
   <p class="lede">You have 138 skills installed from four providers. They are
@@ -22,134 +26,256 @@
     trusting auto-invocation.
   </div>
 
-  <h2>1 · One question, four answers</h2>
-  <p>A skill provider is not just a folder of prompts. Each one is a design
-  bet about where engineering judgment should live: in you, in a routing
-  skill, in documents on disk, or in an injected mandate. Put the two extreme
-  answers on an axis first:</p>
-  <pre class="mermaid">
-flowchart LR
-  mp["<b>mattpocock</b> · 39 skills<br>a toolbox — you pick the tool,<br>you own the process"]
-  pk["<b>pstack</b> · 67 skills<br>a mandate — the hook injects<br>poteto-mode, which owns the process"]
-  mp ---|"control moves from you to the plugin →"| pk
-  </pre>
-  <p>addyosmani sits between them: the skills are standalone playbooks like
-  mattpocock's tools, but a meta-skill (<code>using-agent-skills</code>) ships
-  a phase map that routes tasks to them — advice, not a mandate:</p>
-  <pre class="mermaid">
-flowchart LR
-  mp["<b>mattpocock</b><br>toolbox,<br>you route"]
-  ao["<b>addyosmani</b> · 25 skills<br>playbooks + a routing meta-skill<br>that suggests, never injects"]
-  pk["<b>pstack</b><br>mandate,<br>the hook routes"]
-  mp --- ao --- pk
-  </pre>
-  <p>humanlayer answers the question differently from all three: the process
-  lives in neither you nor a skill but in <em>documents</em>. Its
-  <code>rpi</code> flow writes research, design, and outline artifacts to
-  disk, and each phase runs in a fresh context window that reads them back:</p>
-  <pre class="mermaid">
-flowchart LR
-  mp["<b>mattpocock</b><br>you own it"]
-  ao["<b>addyosmani</b><br>a map suggests"]
-  hl["<b>humanlayer</b> · 7 skills<br>documents own it —<br>fresh session per phase"]
-  pk["<b>pstack</b><br>a mandate owns it"]
-  mp --- ao --- hl --- pk
-  </pre>
-  <p>Everything else in this lesson hangs off this axis. The counts are from
-  your disk, not the READMEs: 25 + 67 + 7 + 39 <code>SKILL.md</code> files
-  (pstack ships one more under <code>grok\</code> — another runtime's slice,
-  same multiplexer pattern as the hooks folder in lesson 3).</p>
+  <nav class="section-nav" aria-label="In this lesson">
+    <a href="#process">01 · Process ownership</a>
+    <a href="#portraits">02 · Provider portraits</a>
+    <a href="#collisions">03 · Collisions</a>
+    <a href="#routing">04 · Routing map</a>
+    <a href="#practice">Practice</a>
+  </nav>
 
-  <h2>2 · Four portraits</h2>
+  <h2 id="process">1 · One question, four answers</h2>
+  <p>Each provider makes a different bet about who directs the work.
+  First compare how skills route a task. Then add the separate question
+  humanlayer answers: how does the work survive a fresh context window?</p>
 
-  <h3>addyosmani — the senior engineer's playbook shelf</h3>
-  <p>25 skills, one per engineering discipline: TDD, debugging, security,
-  performance, CI/CD, shipping, API design, observability. Each is a complete
-  standalone playbook with its own quality gates. The README states the bet
-  plainly: skills “encode the workflows, quality gates, and best practices
-  that senior engineers use when building software”, and the meta-skill is
-  blunter still: <em>“Skills are workflows, not suggestions.”</em>
-  (<code>skills\using-agent-skills\SKILL.md</code>). It is the only provider
-  with dedicated security and frontend-engineering playbooks, and it ships
-  four reviewer agents (<code>code-reviewer</code>,
-  <code>security-auditor</code>, <code>test-engineer</code>,
-  <code>web-performance-auditor</code>) plus hooks — though host support for
-  those varies.</p>
+  <div class="lesson-step">
+    <div>
+      <span class="step-number">01 · Start with the endpoints</span>
+      <h3>You choose, or a mandate routes</h3>
+      <p>mattpocock leaves you in charge of the process. At the other end,
+      pstack's SessionStart hook injects a mandate to use
+      <code>poteto-mode</code>, which routes qualifying tasks to playbooks.</p>
+    </div>
+    <figure class="visual">
+      <figcaption>Who selects the workflow?</figcaption>
+      <ul class="control-axis">
+        <li class="provider-mattpocock">
+          <strong class="provider-name">mattpocock</strong>
+          <p>You pick a skill and compose the process.</p>
+        </li>
+        <li class="axis-gap" aria-hidden="true">More routing delegated →</li>
+        <li class="provider-pstack">
+          <strong class="provider-name">pstack</strong>
+          <p>The injected mandate routes through <code>poteto-mode</code>.</p>
+        </li>
+      </ul>
+      <div class="axis-scale"><span>You select each tool</span><span>A workflow driver selects tools</span></div>
+    </figure>
+  </div>
 
-  <h3>pstack — the operating system</h3>
-  <p>67 skills in four layers: 12 workflow drivers (<code>poteto-mode</code>,
-  <code>architect</code>, <code>arena</code>, <code>how</code>,
-  <code>why</code>…), 24 one-rule <code>principle-*</code> leaves, 29
-  utilities, 2 meta. You know the delivery mechanism from lessons 2–3; the
-  philosophy behind it is in <code>poteto-help</code>: poteto-mode “matches
-  the task to a playbook, copies the playbook's steps into the todo list, and
-  runs the other skills as the steps need them.” Its signature move is
-  spending tokens on rigor — competing design candidates
-  (<code>architect</code>), multi-model bakeoffs with cross-judges
-  (<code>arena</code>), adversarial review panels
-  (<code>interrogate</code>, <code>thermos</code>). The cost is acknowledged,
-  not hidden: “pstack spends extra tokens on subagents and review panels”
-  (<code>skills\poteto-help\SKILL.md</code>).</p>
+  <div class="lesson-step">
+    <div>
+      <span class="step-number">02 · Add an advisory router</span>
+      <h3>A phase map helps you choose</h3>
+      <p>addyosmani supplies standalone discipline playbooks plus
+      <code>using-agent-skills</code>. That workflow driver suggests a phase
+      map, rather than injecting pstack's session-start mandate.</p>
+    </div>
+    <figure class="visual">
+      <figcaption>The endpoints stay in place. Add the suggested route.</figcaption>
+      <ul class="control-axis">
+        <li class="provider-mattpocock">
+          <strong class="provider-name">mattpocock</strong>
+          <p>You pick a skill and compose the process.</p>
+        </li>
+        <li class="provider-addyosmani">
+          <strong class="provider-name">addyosmani</strong>
+          <p>A phase map suggests a discipline playbook.</p>
+        </li>
+        <li class="provider-pstack">
+          <strong class="provider-name">pstack</strong>
+          <p>The injected mandate routes through <code>poteto-mode</code>.</p>
+        </li>
+      </ul>
+      <div class="axis-scale"><span>You select each tool</span><span>A workflow driver selects tools</span></div>
+    </figure>
+  </div>
 
-  <h3>humanlayer — context engineering as a product</h3>
-  <p>Only 7 skills, but <code>rpi</code> alone bundles five subagents and a
-  document pipeline: research → PRD and/or TDD → structure outline →
-  implementation, each phase writing a numbered artifact to
-  <code>.agents/artifacts/&lt;task&gt;/</code>. The two core rules are stated
-  verbatim in <code>rpi\references\workflow.md</code>: “Documents Carry
-  Context Between Sessions” and “Use a separate context window for each phase
-  by default.” One trap for this course: in rpi, <strong>TDD means Technical
-  Design Document</strong>, not test-driven development
-  (<code>references\create-tdd\process.md</code>: “Create a Technical Design
-  Document”). Same acronym, unrelated concept — the first provider collision
-  you've met is a vocabulary collision.</p>
+  <div class="lesson-step">
+    <div>
+      <span class="step-number">03 · Add continuity between sessions</span>
+      <h3>Documents carry the next phase</h3>
+      <p>humanlayer's <code>rpi</code> is not another point on that axis.
+      It writes research, design, and outline artifacts to disk.
+      Each phase uses a fresh context window and reads those documents.</p>
+    </div>
+    <figure class="visual">
+      <figcaption>Workflow selection above. Context continuity below.</figcaption>
+      <ul class="control-axis">
+        <li class="provider-mattpocock">
+          <strong class="provider-name">mattpocock</strong>
+          <p>You pick a skill and compose the process.</p>
+        </li>
+        <li class="provider-addyosmani">
+          <strong class="provider-name">addyosmani</strong>
+          <p>A phase map suggests a discipline playbook.</p>
+        </li>
+        <li class="provider-pstack">
+          <strong class="provider-name">pstack</strong>
+          <p>The injected mandate routes through <code>poteto-mode</code>.</p>
+        </li>
+      </ul>
+      <div class="document-lane provider-humanlayer">
+        <strong class="provider-name">humanlayer · Document-driven phases</strong>
+        <ol class="flow-steps">
+          <li><strong>Research</strong><small>Write findings</small></li>
+          <li><strong>Design</strong><small>Write a PRD, TDD, or both</small></li>
+          <li><strong>Outline</strong><small>Write the structure</small></li>
+          <li><strong>Implement</strong><small>Read the artifacts</small></li>
+        </ol>
+        <p class="figure-note">A fresh context window per phase.
+        Documents preserve the decisions.</p>
+      </div>
+    </figure>
+  </div>
+  <p class="figure-note">The lesson's inventory snapshot counts 25 + 67 + 7 + 39
+  <code>SKILL.md</code> files on disk. These are not live counts.
+  pstack also ships one under <code>grok\</code>, another runtime's slice.</p>
 
-  <h3>mattpocock — the hand-tool drawer</h3>
-  <p>39 skills in four folders (20 engineering, 7 productivity, 8
-  in-progress, 4 misc): specs, tickets, grilling interviews, TDD, code
-  review, domain modeling — and <code>teach</code>, which built this
-  workspace. The README is an explicit counter-position to the other three:
-  skills are “small, easy to adapt, and composable”, unlike frameworks that
-  “take away your control”, for doing “real engineering - not vibe coding”
-  (<code>mattpocock-skills\README.md</code>). No hooks, no mandate, light
-  cross-references only (<code>tdd</code> points at
-  <code>codebase-design</code>; <code>ask-matt</code> routes on request).</p>
+  <h2 id="portraits">2 · Four portraits</h2>
+  <p>Compare the same fields across providers. Open each source note for
+  the supporting quotations and inventory detail.</p>
+  <div class="comparison-grid">
+    <article class="comparison-card provider-mattpocock">
+      <h3 id="mattpocock" class="provider-name">mattpocock</h3>
+      <p class="card-summary">39 skills · You compose the process</p>
+      <dl class="facts">
+        <div><dt>Process owner</dt><dd>You choose small tools and decide the sequence.</dd></div>
+        <div><dt>Entry skill</dt><dd>Choose a tool such as <code>teach</code> or <code>grilling</code>.
+        <code>ask-matt</code> routes on request.</dd></div>
+        <div><dt>Best fit</dt><dd>Specs, tickets, interviews, PR prose, and learning.</dd></div>
+        <div><dt>Tradeoff</dt><dd>You keep control, and you supply the coordination.</dd></div>
+      </dl>
+      <details>
+        <summary>Source and inventory</summary>
+        <p>The README calls the skills "small, easy to adapt, and composable",
+        unlike frameworks that "take away your control", for
+        "real engineering - not vibe coding".
+        <code>mattpocock-skills\README.md</code>.</p>
+        <p>20 engineering, 7 productivity, 8 in-progress, and 4 misc.
+        No hooks or mandate. Cross-references connect tools such as
+        <code>tdd</code> and <code>codebase-design</code>.</p>
+      </details>
+    </article>
+    <article class="comparison-card provider-addyosmani">
+      <h3 id="addyosmani" class="provider-name">addyosmani</h3>
+      <p class="card-summary">25 skills · Discipline playbooks</p>
+      <dl class="facts">
+        <div><dt>Process owner</dt><dd>The chosen playbook supplies the workflow and quality gates.</dd></div>
+        <div><dt>Entry skill</dt><dd>A discipline skill, or
+        <code>using-agent-skills</code> for its suggested phase map.</dd></div>
+        <div><dt>Best fit</dt><dd>Test-first coding, debugging, security, frontend work,
+        performance, CI/CD, and shipping.</dd></div>
+        <div><dt>Tradeoff</dt><dd>A complete workflow for one discipline, not an injected
+        mandate that coordinates the whole session.</dd></div>
+      </dl>
+      <details>
+        <summary>Source and inventory</summary>
+        <p>"Skills are workflows, not suggestions."
+        <code>skills\using-agent-skills\SKILL.md</code>.
+        The README says they encode senior engineers' workflows,
+        quality gates, and best practices.</p>
+        <p>The inventory includes four reviewer agents:
+        <code>code-reviewer</code>, <code>security-auditor</code>,
+        <code>test-engineer</code>, and <code>web-performance-auditor</code>.
+        Hooks also ship, with host-dependent support.</p>
+      </details>
+    </article>
+    <article class="comparison-card provider-pstack">
+      <h3 id="pstack" class="provider-name">pstack</h3>
+      <p class="card-summary">67 skills · Mandated routing and review</p>
+      <dl class="facts">
+        <div><dt>Process owner</dt><dd><code>poteto-mode</code> routes qualifying tasks
+        under the injected mandate.</dd></div>
+        <div><dt>Entry skill</dt><dd><code>poteto-mode</code>, then workflow drivers
+        such as <code>architect</code> and <code>arena</code>.</dd></div>
+        <div><dt>Best fit</dt><dd>Contested designs and implementations that justify
+        competing candidates and independent review.</dd></div>
+        <div><dt>Tradeoff</dt><dd>Subagents and review panels cost extra tokens.</dd></div>
+      </dl>
+      <details>
+        <summary>Source and inventory</summary>
+        <p>poteto-mode "matches the task to a playbook, copies the playbook's
+        steps into the todo list, and runs the other skills as the steps need them."
+        "pstack spends extra tokens on subagents and review panels."
+        <code>skills\poteto-help\SKILL.md</code>.</p>
+        <p>12 workflow drivers, 24 <code>principle-*</code> leaves,
+        29 utilities, and 2 meta skills. <code>interrogate</code> and
+        <code>thermos</code> add adversarial review.</p>
+      </details>
+    </article>
+    <article class="comparison-card provider-humanlayer">
+      <h3 id="humanlayer" class="provider-name">humanlayer</h3>
+      <p class="card-summary">7 skills · Documents carry context</p>
+      <dl class="facts">
+        <div><dt>Process owner</dt><dd>The document pipeline guides each fresh context window.</dd></div>
+        <div><dt>Entry skill</dt><dd><code>rpi</code> for research, design, outline,
+        and implementation.</dd></div>
+        <div><dt>Best fit</dt><dd>Features that span days or multiple context windows.</dd></div>
+        <div><dt>Tradeoff</dt><dd>You maintain and review artifacts instead of relying on chat history.</dd></div>
+      </dl>
+      <details>
+        <summary>Source and inventory</summary>
+        <p>"Documents Carry Context Between Sessions" and
+        "Use a separate context window for each phase by default."
+        <code>rpi\references\workflow.md</code>.</p>
+        <p><code>rpi</code> bundles five subagents. Its numbered artifacts live
+        in <code>.agents/artifacts/&lt;task&gt;/</code>.
+        <code>references\create-tdd\process.md</code> is titled
+        "Create a Technical Design Document".</p>
+      </details>
+    </article>
+  </div>
+  <div class="win">
+    In humanlayer's <code>rpi</code>, <strong>TDD means Technical Design
+    Document</strong>. It does not mean test-driven development.
+    The same acronym names two different jobs.
+  </div>
 
-  <h2>3 · Where they collide</h2>
+  <h2 id="collisions">3 · Where they collide</h2>
   <p>Auto-invocation picks a skill by matching your words against every
   installed <code>description</code> — the trigger surface from lesson 1.
   With four providers, several jobs now have two to four claimants:</p>
-  <table>
-    <tr><th>Domain</th><th>addyosmani</th><th>pstack</th><th>humanlayer</th><th>mattpocock</th></tr>
+  <p class="table-hint">Direct = covers the job. Partial = a related, narrower job.
+  None = no equivalent in this comparison. On a narrow screen, scroll the table
+  sideways, or focus it and use the arrow keys.</p>
+  <div class="table-scroll" role="region" aria-label="Provider collision comparison" tabindex="0">
+  <table class="comparison-table">
+    <caption>Collision domains across the four providers</caption>
+    <thead><tr><th scope="col">Domain</th><th scope="col">addyosmani</th><th scope="col">pstack</th><th scope="col">humanlayer</th><th scope="col">mattpocock</th></tr></thead>
+    <tbody>
     <tr>
-      <td><strong>Test-first coding</strong></td>
-      <td><code>test-driven-development</code></td>
-      <td><code>tdd</code></td>
-      <td>— (its “TDD” is a design doc)</td>
-      <td><code>tdd</code></td>
+      <th scope="row">Test-first coding</th>
+      <td><span class="coverage coverage-direct">Direct</span><code>test-driven-development</code></td>
+      <td><span class="coverage coverage-direct">Direct</span><code>tdd</code></td>
+      <td><span class="coverage coverage-none">None</span>Its "TDD" is a design document.</td>
+      <td><span class="coverage coverage-direct">Direct</span><code>tdd</code></td>
     </tr>
     <tr>
-      <td><strong>Code review</strong></td>
-      <td><code>code-review-and-quality</code></td>
-      <td><code>thermos</code>, <code>interrogate</code>, <code>thermo-nuclear-*</code></td>
-      <td><code>visual-pr</code> (PR prose only)</td>
-      <td><code>code-review</code></td>
+      <th scope="row">Code review</th>
+      <td><span class="coverage coverage-direct">Direct</span><code>code-review-and-quality</code></td>
+      <td><span class="coverage coverage-direct">Direct</span><code>thermos</code>, <code>interrogate</code>, <code>thermo-nuclear-*</code></td>
+      <td><span class="coverage coverage-partial">Partial</span><code>visual-pr</code> covers PR prose, not code review.</td>
+      <td><span class="coverage coverage-direct">Direct</span><code>code-review</code></td>
     </tr>
     <tr>
-      <td><strong>Planning &amp; breakdown</strong></td>
-      <td><code>planning-and-task-breakdown</code>, <code>spec-driven-development</code></td>
-      <td><code>poteto-mode</code> playbooks, <code>figure-it-out</code></td>
-      <td><code>rpi</code> (research → outline)</td>
-      <td><code>to-spec</code>, <code>to-tickets</code>, <code>wayfinder</code></td>
+      <th scope="row">Planning &amp; breakdown</th>
+      <td><span class="coverage coverage-direct">Direct</span><code>planning-and-task-breakdown</code>, <code>spec-driven-development</code></td>
+      <td><span class="coverage coverage-direct">Direct</span><code>poteto-mode</code> playbooks, <code>figure-it-out</code></td>
+      <td><span class="coverage coverage-direct">Direct</span><code>rpi</code> covers research through outline.</td>
+      <td><span class="coverage coverage-direct">Direct</span><code>to-spec</code>, <code>to-tickets</code>, <code>wayfinder</code></td>
     </tr>
     <tr>
-      <td><strong>Explaining / teaching</strong></td>
-      <td>—</td>
-      <td><code>teach</code>, <code>how</code>, <code>why</code></td>
-      <td><code>show-me</code></td>
-      <td><code>teach</code></td>
+      <th scope="row">Explaining / teaching</th>
+      <td><span class="coverage coverage-none">None</span>No teaching equivalent here.</td>
+      <td><span class="coverage coverage-direct">Direct</span><code>teach</code>, <code>how</code>, <code>why</code></td>
+      <td><span class="coverage coverage-partial">Partial</span><code>show-me</code> supplies focused visual explanations.</td>
+      <td><span class="coverage coverage-direct">Direct</span><code>teach</code></td>
     </tr>
+    </tbody>
   </table>
+  </div>
   <p>The last row is not hypothetical: this very lesson was produced by all
   three teaching claimants at once — your <code>AGENTS.md</code> routes
   mattpocock's <code>teach</code>, deepened by pstack's <code>teach</code>
@@ -161,49 +287,49 @@ flowchart LR
   engineering have exactly one dedicated playbook each (both addyosmani), so
   for those jobs there is nothing to route between.</p>
 
-  <h2>4 · The routing map</h2>
-  <p>The payoff. Read the left column as “the job in front of me”, not “the
-  provider I like”:</p>
-  <table>
-    <tr><th>The job</th><th>Reach for</th><th>Why this one</th></tr>
-    <tr>
-      <td>A discipline question mid-task: debug this properly, harden this,
-      optimize this, ship this</td>
-      <td>the matching <strong>addyosmani</strong> playbook</td>
-      <td>One self-contained playbook per discipline with explicit
-      verification gates; cheap — no subagent fan-out required</td>
-    </tr>
-    <tr>
-      <td>A contested design, or an implementation worth real rigor</td>
-      <td><strong>pstack</strong>: <code>poteto-mode</code> →
-      <code>architect</code> / <code>arena</code></td>
-      <td>Competing candidates, cross-model judging, verification culture —
-      deliberately expensive, so reserve it for work that deserves it</td>
-    </tr>
-    <tr>
-      <td>A feature spanning days or context windows</td>
-      <td><strong>humanlayer</strong> <code>rpi</code></td>
-      <td>Decisions live in reviewed documents, not chat history; each phase
-      restarts clean and reads them back</td>
-    </tr>
-    <tr>
-      <td>Specs, tickets, plan interviews, PR prose, learning</td>
-      <td><strong>mattpocock</strong> (<code>to-spec</code>,
-      <code>grilling</code>, <code>pr</code>, <code>teach</code>…)</td>
-      <td>Small composable tools that leave you in charge of the flow</td>
-    </tr>
-    <tr>
-      <td>A one-rule course correction mid-task</td>
-      <td>a <strong>pstack</strong> <code>principle-*</code> leaf</td>
-      <td>24 single-rule skills, citable from inside any other flow</td>
-    </tr>
-    <tr>
-      <td>“Just show me what you mean”</td>
-      <td><strong>humanlayer</strong> <code>show-me</code></td>
-      <td>The smallest diagram or sketch that makes the point — used in every
-      lesson of this course</td>
-    </tr>
-  </table>
+  <h2 id="routing">4 · The routing map</h2>
+  <p>Start with the job, then follow its route to a provider.
+  These are starting points, not exclusive assignments.
+  The <a href="../reference/0004-provider-routing-map.html#routing">reference
+  keeps the compact lookup table</a>.</p>
+  <ul class="route-list">
+    <li class="provider-addyosmani">
+      <h3>Debug, harden, optimize, or ship</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">addyosmani</strong>The matching discipline playbook</p>
+      <p class="route-reason">A self-contained workflow with verification gates.
+      No subagent fan-out required.</p>
+    </li>
+    <li class="provider-pstack">
+      <h3>Compare contested designs</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">pstack</strong><code>poteto-mode</code>,
+      then <code>architect</code> or <code>arena</code></p>
+      <p class="route-reason">Competing candidates and cross-model judging.
+      Reserve the extra token cost for work that warrants it.</p>
+    </li>
+    <li class="provider-humanlayer">
+      <h3>Build across days or context windows</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">humanlayer</strong><code>rpi</code></p>
+      <p class="route-reason">Reviewed documents preserve decisions.
+      Each fresh phase reads them back.</p>
+    </li>
+    <li class="provider-mattpocock">
+      <h3>Write specs, tickets, PR prose, or lessons</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">mattpocock</strong><code>to-spec</code>,
+      <code>grilling</code>, <code>pr</code>, or <code>teach</code></p>
+      <p class="route-reason">Small composable tools.
+      You keep control of the sequence.</p>
+    </li>
+    <li class="provider-pstack">
+      <h3>Apply one course correction</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">pstack</strong>A <code>principle-*</code> leaf</p>
+      <p class="route-reason">One rule you can apply inside another workflow.</p>
+    </li>
+    <li class="provider-humanlayer">
+      <h3>Explain something visually</h3><span class="route-arrow" aria-hidden="true">→</span>
+      <p class="route-target"><strong class="provider-name">humanlayer</strong><code>show-me</code></p>
+      <p class="route-reason">A focused diagram or sketch beside the explanation.</p>
+    </li>
+  </ul>
   <p>Notice what the map does <em>not</em> say: it never routes by provider
   loyalty. mattpocock for prose <em>and</em> pstack for rigor <em>and</em>
   addyosmani for discipline is the intended end state — curation, not a
@@ -225,7 +351,7 @@ flowchart LR
     </ol>
   </div>
 
-  <h2>Check yourself</h2>
+  <h2 id="practice">Check yourself</h2>
   <div id="quiz"></div>
 
   <div class="source">
@@ -256,7 +382,6 @@ flowchart LR
 </main>
 
 <script src="../assets/quiz.js"></script>
-<script src="../assets/mermaid.js"></script>
 <script>
 renderQuiz("quiz", [
   {
