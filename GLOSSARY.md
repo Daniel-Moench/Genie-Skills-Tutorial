@@ -25,6 +25,17 @@ A skill's `description` field, which the model matches against the task to
 decide automatic invocation — the cause of provider collisions.
 _Avoid_: summary, docstring
 
+**Workflow driver**:
+A skill whose job is to route or orchestrate other skills rather than do the
+work itself (`poteto-mode`, `using-agent-skills`, `rpi`, `ask-matt`).
+_Avoid_: orchestrator skill, meta-prompt
+
+**Collision domain**:
+A job claimed by skills from several providers at once (test-first coding,
+code review, planning, teaching), where auto-invocation picks by trigger
+surface unless a written routing rule decides.
+_Avoid_: conflict, overlap (alone)
+
 ---
 
 [Course index](index.html)

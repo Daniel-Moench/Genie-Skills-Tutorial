@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference · Provider routing map</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference 0004 · AI agent skills for GitHub Copilot</p>
+  <h1>Provider routing map</h1>
+  <p class="lede">Four providers, one axis, one routing table. From
+  <a href="../lessons/0004-provider-philosophies-compared.html">lesson 0004</a>.</p>
+
+  <h2>The control axis</h2>
+  <pre><code>you own the process ──────────────────────────────▶ the plugin owns the process
+
+mattpocock          addyosmani            humanlayer              pstack
+39 hand tools       25 playbooks +        7 skills; documents     67 skills; injected
+you route           a meta-skill map      own the process,        mandate routes to
+                    that suggests         fresh session/phase     playbooks + panels</code></pre>
+
+  <h2>One-liners (evidenced)</h2>
+  <pre><code>addyosmani   "Skills are workflows, not suggestions."     (using-agent-skills\SKILL.md)
+pstack       poteto-mode "matches the task to a playbook, copies the playbook's
+             steps into the todo list"; "spends extra tokens on subagents and
+             review panels"                                 (poteto-help\SKILL.md)
+humanlayer   "Documents Carry Context Between Sessions";
+             "Use a separate context window for each phase" (rpi\references\workflow.md)
+mattpocock   "small, easy to adapt, and composable" vs frameworks that
+             "take away your control"                       (README.md)</code></pre>
+
+  <h2>Routing table</h2>
+  <table>
+    <tr><th>The job</th><th>Reach for</th></tr>
+    <tr><td>Discipline question mid-task (debug / harden / optimize / ship / CI)</td>
+        <td>addyosmani playbook (<code>debugging-and-error-recovery</code>,
+        <code>security-and-hardening</code>, <code>performance-optimization</code>,
+        <code>shipping-and-launch</code>…)</td></tr>
+    <tr><td>Contested design; implementation worth real rigor (and tokens)</td>
+        <td>pstack <code>poteto-mode</code> → <code>architect</code> / <code>arena</code></td></tr>
+    <tr><td>Feature spanning days / context windows</td>
+        <td>humanlayer <code>rpi</code> (artifacts in <code>.agents/artifacts/&lt;task&gt;/</code>)</td></tr>
+    <tr><td>Specs, tickets, plan interviews, PR prose, learning</td>
+        <td>mattpocock <code>to-spec</code> · <code>to-tickets</code> ·
+        <code>grilling</code> · <code>pr</code> · <code>teach</code></td></tr>
+    <tr><td>One-rule course correction</td>
+        <td>pstack <code>principle-*</code> (24 single-rule leaves)</td></tr>
+    <tr><td>Quick visual explanation</td>
+        <td>humanlayer <code>show-me</code></td></tr>
+  </table>
+
+  <h2>Collision domains (route by name, not auto-invocation)</h2>
+  <pre><code>test-first coding   addy test-driven-development · pstack tdd · mattpocock tdd
+                    ⚠ humanlayer "TDD" = Technical Design Document, not tests
+code review         addy code-review-and-quality · pstack thermos/interrogate/
+                    thermo-nuclear-* · mattpocock code-review
+planning            addy planning-and-task-breakdown, spec-driven-development ·
+                    pstack poteto-mode, figure-it-out · humanlayer rpi ·
+                    mattpocock to-spec, to-tickets, wayfinder
+teaching            mattpocock teach · pstack teach/how/why · humanlayer show-me
+                    (this workspace layers all three — AGENTS.md "Workspace work")</code></pre>
+
+  <h2>Gaps (exactly one provider)</h2>
+  <pre><code>security (dedicated)   addyosmani security-and-hardening only
+frontend engineering   addyosmani frontend-ui-engineering only
+scheduled agent loops  humanlayer build-iterated-agentic-loop / design-control-loop only
+one-rule principles    pstack principle-* only</code></pre>
+
+  <h2>Shapes at a glance</h2>
+  <table>
+    <tr><th></th><th>addyosmani</th><th>pstack</th><th>humanlayer</th><th>mattpocock</th></tr>
+    <tr><td>Skills on disk</td><td>25</td><td>67 (+1 grok slice)</td><td>7</td><td>39</td></tr>
+    <tr><td>Structure</td><td>flat playbooks</td>
+        <td>12 drivers · 24 principles · 29 utilities · 2 meta</td>
+        <td>rpi + 6 satellites</td>
+        <td>20 eng · 7 productivity · 8 in-progress · 4 misc</td></tr>
+    <tr><td>Router</td><td><code>using-agent-skills</code> (advice)</td>
+        <td><code>poteto-mode</code> (mandated)</td>
+        <td>artifact filenames + flow choice</td>
+        <td><code>ask-matt</code> (on request)</td></tr>
+    <tr><td>Ships agents</td><td>4 reviewers</td><td>per-workflow panels</td>
+        <td>5 rpi subagents</td><td>none</td></tr>
+    <tr><td>Ships hooks</td><td>yes (host-dependent)</td><td>yes (lessons 2–3)</td>
+        <td>no</td><td>no</td></tr>
+    <tr><td>Token appetite</td><td>low–mid</td><td>high, by design</td>
+        <td>mid (fresh sessions)</td><td>low</td></tr>
+  </table>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Lesson: <a href="../lessons/0004-provider-philosophies-compared.html">Lesson 0004 — provider philosophies compared</a></li>
+      <li>Workspace: <a href="../index.html">Index</a> · <a href="../GLOSSARY.md">Glossary</a></li>
+    </ul>
+  </nav>
+</main>
+</body>
+</html>

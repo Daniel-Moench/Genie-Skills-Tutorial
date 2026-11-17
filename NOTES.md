@@ -22,8 +22,10 @@
 ## Environment facts (verified 2026-11-13)
 
 - Plugins live in `~\.copilot\installed-plugins\<marketplace>\<plugin>\`:
-  `addy-agent-skills` (25 skills), `mattpocock` (40), `pstack-claude` (~70),
+  `addy-agent-skills` (25 skills), `mattpocock` (39: 20 eng, 7 productivity,
+  8 in-progress, 4 misc), `pstack-claude` (67 in `skills\` + 1 grok slice),
   `skills` = humanlayer (7), `_direct` (1: ai-prompt-engineering-safety-review).
+  Counts verified via SKILL.md file count 2026-11-17.
 - pstack hooks ship **inside the plugin** (`...\pstack\hooks\`); setup-pstack
   generated only `~\.copilot\pstack-models.md`.
 - Registration: `~\.copilot\config.json` (marketplaces) and
@@ -46,8 +48,9 @@
    - ✔ Follow-up (0003): inside the hook engine — multi-runtime folder map,
      awk rationale, PreToolUse gate, Windows `exit 0`, `session hook: off`
      correction. Triggered by Daniel's pushback on lesson 0002.
-3. Provider philosophies compared: addyosmani vs pstack vs humanlayer vs
-   mattpocock (routing map: which provider for which job)
+3. ✔ Provider philosophies compared (0004): control axis, four portraits,
+   collision domains, routing map. humanlayer "TDD" = Technical Design
+   Document, not test-driven development.
 4. Experiment: humanlayer `rpi` end-to-end on a toy task
 5. Experiment: pstack `poteto-mode` routing (+ `architect` or `arena`)
 6. Combining providers: collisions (3× TDD), layering, custom routing
