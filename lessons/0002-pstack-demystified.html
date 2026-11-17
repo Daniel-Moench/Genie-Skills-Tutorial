@@ -118,7 +118,7 @@ flowchart TD
   and <code>.github\copilot-instructions.md</code> count as user instructions
   too. The mandate is a default, not a law.</p>
 
-  <h2>5 · Your three switches</h2>
+  <h2>5 · Your switches</h2>
   <table>
     <tr><th>Option</th><th>How</th><th>Effect</th></tr>
     <tr>
@@ -132,6 +132,14 @@ flowchart TD
       <td>Edit <code>pstack-models.md</code> or rerun
       <code>setup-pstack</code></td>
       <td>Pin real models per role; machinery starts doing something</td>
+    </tr>
+    <tr>
+      <td>Stop the mandate, keep the toolbox (native)</td>
+      <td><code>session hook: off</code> in
+      <code>~\.copilot\pstack-models.md</code></td>
+      <td>Hook prints nothing — no injected block; every pstack skill stays
+      invocable by name (correction from
+      <a href="0003-inside-the-hook-engine.html">lesson 0003</a>)</td>
     </tr>
     <tr>
       <td>Mute the router, keep the toolbox</td>
@@ -194,7 +202,7 @@ flowchart TD
   <nav class="lesson-nav">
     <ul>
       <li>Previous: <a href="0001-skill-discovery-and-loading.html">Lesson 0001 — skill discovery &amp; loading</a></li>
-      <li>Next: Lesson 0003 — provider philosophies compared (planned)</li>
+      <li>Next: <a href="0003-inside-the-hook-engine.html">Lesson 0003 — inside the hook engine</a></li>
       <li>Reference: <a href="../reference/0002-pstack-machinery-map.html">pstack machinery map</a></li>
       <li>Workspace: <a href="../index.html">Index</a> · <a href="../GLOSSARY.md">Glossary</a> · <a href="../MISSION.md">Mission</a></li>
     </ul>

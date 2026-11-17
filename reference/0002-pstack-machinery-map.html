@@ -72,6 +72,8 @@ precedence: user instructions &gt; mandate
     <tr><th>Goal</th><th>Switch</th></tr>
     <tr><td>Remove everything (mandate + skills + agents)</td>
         <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
+    <tr><td>Stop mandate, keep skills (native)</td>
+        <td><code>session hook: off</code> in <code>~\.copilot\pstack-models.md</code></td></tr>
     <tr><td>Mute router, keep skills invocable</td>
         <td>Override line in <code>~\.copilot\copilot-instructions.md</code></td></tr>
     <tr><td>Pin models per role</td>
