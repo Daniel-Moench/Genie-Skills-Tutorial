@@ -14,3 +14,7 @@ Self-reported 2026-11-16: "I understand lesson 1. all self-checks passed."
 - ZPD advances to pstack machinery (lesson 0002 targets the biggest stated
   confusion from the baseline record 0001).
 - `GLOSSARY.md` gains **Progressive disclosure** and **Trigger surface**.
+
+---
+
+[Course index](../index.html)
