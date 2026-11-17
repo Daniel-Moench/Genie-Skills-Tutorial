@@ -5,12 +5,11 @@
 - Already knows what a skill is and mostly understands mattpocock/skills —
   skip beginner "what is a SKILL.md" material; mechanics and flows are the
   interesting part.
-- Wants hands-on experiments, short lessons.
+- Wants hands-on experiments.
 - Target surfaces: VSCode, IntelliJ, Copilot Desktop App, Copilot CLI.
 - End goal is a decision: which skills to keep and how to configure them.
-- Wants show-me-style visuals in lessons (file trees, call trees, Mermaid
-  flow diagrams) — requested via `/show-me`, 2026-11-16. Reusable loader:
-  `assets/mermaid.js`.
+- Wants visuals in lessons — requested via `/show-me` skill (not model-invocable,
+  use `~\.copilot\installed-plugins\skills\show-me\skills\show-me\SKILL.md`).
 
 ## Standing decisions
 
@@ -32,9 +31,9 @@
 
 ## Planned repo structure
 
-- `lessons/` `reference/` `learning-records/` `assets/` — teach-skill layout.
-- `index.html` — GitHub Pages entry point; update its lesson/reference tables
-  whenever a new lesson or cheat sheet lands.
+- `lessons/` `reference/` `learning-records/` `assets/` — teach-skill layout;
+  doc conventions (index tables, index links, shared stylesheet, browser
+  verification) live in `AGENTS.md` → "Workspace docs".
 - `experiments/` — created lazily when the first hands-on experiment with a
   skill produces artifacts worth keeping.
 - `docs/agents/` — pre-existing agent conventions (issue tracker, triage).
