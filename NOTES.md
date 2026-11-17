@@ -32,9 +32,9 @@
 
 ## Planned repo structure
 
-- `lessons/` `reference/` `learning-records/` `assets/` — teach-skill layout.
-- `index.html` — GitHub Pages entry point; update its lesson/reference tables
-  whenever a new lesson or cheat sheet lands.
+- `lessons/` `reference/` `learning-records/` `assets/` — teach-skill layout;
+  doc conventions (index tables, index links, shared stylesheet, browser
+  verification) live in `AGENTS.md` → "Workspace docs".
 - `experiments/` — created lazily when the first hands-on experiment with a
   skill produces artifacts worth keeping.
 - `docs/agents/` — pre-existing agent conventions (issue tracker, triage).
