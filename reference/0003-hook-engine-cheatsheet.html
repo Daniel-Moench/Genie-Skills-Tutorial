@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference · Hook engine cheat sheet</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference 0003 · AI agent skills for GitHub Copilot</p>
+  <h1>Hook engine cheat sheet</h1>
+  <p class="lede">The 21-file hooks folder, compressed. From
+  <a href="../lessons/0003-inside-the-hook-engine.html">lesson 0003</a>.</p>
+
+  <h2>Who reads what</h2>
+  <pre><code>Copilot/Windows (your 5):  copilot-hooks.json · session-start.ps1
+                           session-start-context.md · session-start-copilot.md
+                           session-start-copilot-{sheet,setup}.md
+Claude Code:               hooks.json  → session-start.sh, pre-tool-use.sh
+Codex:                     codex-hooks.json
+Muse / Antigravity /       session-start-{muse,agy,minimax,opencode}.md,
+MiniMax / OpenCode / Kimi: muse-/agy-context.awk, kimi-instructions.md
+Unix engine (shared):      session-start.sh · copilot-context.awk · json.awk
+                           pre-tool-use.sh · pre-tool-use.awk · script-contracts.awk</code></pre>
+
+  <h2>Why awk</h2>
+  <pre><code>Requirement: run on any Unix with zero installed dependencies.
+POSIX guarantees exactly two scripting languages: sh and awk.
+json.awk           JSON parser for the event piped in on stdin
+copilot-context.awk Unix twin of session-start.ps1 (assembles the block)
+pre-tool-use.awk    tool-gate verdicts
+script-contracts.awk allowlisted scripts + legal argument shapes</code></pre>
+
+  <h2>Session-start outcomes</h2>
+  <pre><code>no sheet        → mandate + notes + setup text
+sheet valid     → mandate + notes + preamble + role lines (rebuilt, never quoted)
+sheet invalid   → mandate + notes + problem list + setup text
+fires only on:    startup | resume | clear | compact
+                  (sheet edits need a fresh/resumed session)</code></pre>
+
+  <h2>PreToolUse verdicts (Unix only)</h2>
+  <pre><code>view  inside plugin folder                    → allow
+bash  one of 7 scripts, matching contract     → allow
+task  pstack:* agent, model not in sheet      → deny
+anything else                                 → silent (normal permission flow)
+
+Windows: "exit 0" — a failing hook can block tools, sh+awk not guaranteed,
+so a no-op stub is the only safe port. Costs: more permission prompts,
+sheet enforcement is advisory only.</code></pre>
+
+  <h2>All four switches</h2>
+  <table>
+    <tr><th>Goal</th><th>Switch</th></tr>
+    <tr><td>Remove everything (mandate + skills + agents)</td>
+        <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
+    <tr><td>Stop the mandate, keep skills (plugin-native: the hook still
+        fires, pstack's script reads the line and prints nothing)</td>
+        <td><code>session hook: off</code> in <code>~\.copilot\pstack-models.md</code></td></tr>
+    <tr><td>Soften the mandate, keep skills (override)</td>
+        <td>Line in <code>~\.copilot\copilot-instructions.md</code></td></tr>
+    <tr><td>Pin models per role</td>
+        <td>Edit the sheet or rerun <code>setup-pstack</code></td></tr>
+  </table>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Lesson: <a href="../lessons/0003-inside-the-hook-engine.html">0003 — inside the hook engine</a></li>
+      <li>Related: <a href="0002-pstack-machinery-map.html">pstack machinery map</a></li>
+      <li>Docs: <a href="https://docs.github.com/en/copilot/reference/hooks-reference">Hooks reference</a> · <a href="https://docs.github.com/en/copilot/concepts/customizations/hooks">Hooks for Copilot</a></li>
+    </ul>
+  </nav>
+</main>
+</body>
+</html>

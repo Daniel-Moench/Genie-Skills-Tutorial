@@ -44,6 +44,9 @@
 1. ✔ Skill discovery & loading mechanics (0001)
 2. ✔ pstack demystified: poteto-mode, hooks, model sheet (0002) — decision
    itself deferred to after item 5
+   - ✔ Follow-up (0003): inside the hook engine — multi-runtime folder map,
+     awk rationale, PreToolUse gate, Windows `exit 0`, `session hook: off`
+     correction. Triggered by Daniel's pushback on lesson 0002.
 3. Provider philosophies compared: addyosmani vs pstack vs humanlayer vs
    mattpocock (routing map: which provider for which job)
 4. Experiment: humanlayer `rpi` end-to-end on a toy task

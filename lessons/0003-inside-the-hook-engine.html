@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 · Inside the hook engine</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lesson 0003 · AI agent skills for GitHub Copilot</p>
+  <h1>Inside the hook engine</h1>
+  <p class="lede">Lesson 2 called the hooks folder "surprisingly readable" —
+  and you rightly pushed back: it holds 21 files, half of them in awk. This
+  lesson maps the whole folder, explains the awk, and corrects two things
+  lesson 2 oversimplified.</p>
+
+  <div class="win">
+    After this lesson you can name which of the 21 hook files actually run on
+    your machine (five), read the Unix tool gate well enough to know what you
+    are <em>not</em> getting on Windows, and you know a fourth off-switch
+    lesson 2 missed.
+  </div>
+
+  <h2>1 · One folder, ten runtimes</h2>
+  <p>The folder looks complex because it is a <em>multiplexer</em>: one plugin
+  ships hook support for about ten different agent runtimes (Claude Code,
+  Codex, Copilot, Muse, MiniMax, Antigravity, Kimi, OpenCode…). Each runtime
+  reads only its own slice. Yours, on Copilot for Windows, is five files:</p>
+  <pre><code>~\.copilot\installed-plugins\pstack-claude\pstack\hooks\
+│
+│  ── runs on YOUR machine ──────────────────────────────────
+├── copilot-hooks.json             # the only registration Copilot reads
+├── session-start.ps1              # the only code Copilot runs on Windows
+├── session-start-context.md       # text part 1: the mandate
+├── session-start-copilot.md       # text part 2: Copilot notes
+├── session-start-copilot-sheet.md # text part 3a: valid-sheet preamble
+├── session-start-copilot-setup.md # text part 3b: "run setup-pstack" fallback
+│
+│  ── other runtimes' registrations ────────────────────────
+├── hooks.json                     # Claude Code
+├── codex-hooks.json               # Codex
+│
+│  ── other runtimes' payload texts ──────────────────────
+├── session-start-muse.md / -muse-sheet.md / muse-context.awk
+├── session-start-agy.md / agy-context.awk      # Antigravity
+├── session-start-minimax.md
+├── session-start-opencode.md
+├── kimi-instructions.md
+│
+│  ── the Unix engine (next sections) ─────────────────────
+├── session-start.sh               # Unix twin of the .ps1
+├── copilot-context.awk            # Unix block assembler
+├── json.awk                       # shared JSON parser
+├── pre-tool-use.sh                # Unix tool gate entry
+├── pre-tool-use.awk               # the gate's verdict logic
+└── script-contracts.awk           # allowlist of runnable scripts</code></pre>
+  <p>So the mental model from lesson 2 survives, sharpened: not "the folder is
+  simple" but "<strong>your slice of the folder is simple</strong>". The bulk
+  is the same machinery re-targeted at nine other runtimes.</p>
+
+  <h2>2 · Why awk, of all things</h2>
+  <p>The Unix half is written in awk because the hook must run on <em>any</em>
+  machine with zero installed dependencies — no Python, no Node, no jq. The
+  only scripting languages POSIX guarantees on every Unix are <code>sh</code>
+  and <code>awk</code>. So the author built the tooling from exactly those:</p>
+  <table>
+    <tr><th>File</th><th>Role</th></tr>
+    <tr><td><code>json.awk</code></td>
+        <td>A miniature JSON library: parses the event JSON the runtime pipes
+        into the hook on stdin</td></tr>
+    <tr><td><code>copilot-context.awk</code></td>
+        <td>The Unix block assembler: concatenates the three markdown parts,
+        validates the sheet, rebuilds the role lines — the same job
+        <code>session-start.ps1</code> does on Windows</td></tr>
+    <tr><td><code>pre-tool-use.awk</code></td>
+        <td>The tool gate's verdict logic (section 4)</td></tr>
+    <tr><td><code>script-contracts.awk</code></td>
+        <td>Declares which plugin scripts the gate may auto-approve, and with
+        which argument shapes</td></tr>
+    <tr><td><code>muse-context.awk</code>, <code>agy-context.awk</code></td>
+        <td>The same assembler, re-targeted at Muse and Antigravity</td></tr>
+  </table>
+  <p>On Windows there is no POSIX guarantee, so the author wrote one
+  PowerShell twin for the session-start path (<code>session-start.ps1</code>)
+  — and, crucially, <em>did not</em> port the tool gate. More on that in
+  section 4.</p>
+
+  <h2>3 · The session-start flow, now with all branches</h2>
+  <p>Lesson 2 showed a two-way branch (sheet valid / not). The real flow has
+  three outcomes. First, your very first session ever — no sheet exists
+  yet:</p>
+  <pre class="mermaid">
+flowchart TD
+  A["Session event:<br>startup · resume · clear · compact"] --> B["session-start.ps1 copilot"]
+  B --> C{"pstack-models.md<br>exists?"}
+  C -->|"no"| D["mandate + Copilot notes<br>+ setup text:<br>'run setup-pstack first'"]
+  </pre>
+  <p>Once the sheet exists, the script validates every line against the
+  plugin's <code>models.json</code> and splits again:</p>
+  <pre class="mermaid">
+flowchart TD
+  C{"pstack-models.md<br>exists?"} -->|"no"| D["mandate + notes<br>+ setup text"]
+  C -->|"yes"| E{"every line valid<br>against models.json?"}
+  E -->|"valid"| F["mandate + notes + sheet preamble<br>+ role lines REBUILT from<br>parsed values, not quoted"]
+  E -->|"invalid"| G["mandate + notes<br>+ list of problems<br>+ setup text"]
+  </pre>
+  <p>Two details worth keeping: the role lines in your injected block are
+  <em>reconstructed</em> from validated values — raw sheet text is never
+  quoted into your context (the prompt-injection guard from lesson 2). And the
+  hook fires only on the four matcher events; mid-session nothing re-reads the
+  sheet, which is why sheet edits need a fresh or resumed session to take
+  effect.</p>
+
+  <h2>4 · The tool gate Windows doesn't have</h2>
+  <p>The second hook, <code>PreToolUse</code>, runs <em>before</em> matched
+  tool calls (<code>view</code>, <code>task</code>, <code>bash</code>). On
+  Unix, <code>pre-tool-use.sh</code> + the two awk files return one of three
+  verdicts:</p>
+  <table>
+    <tr><th>Tool call</th><th>Verdict</th><th>Why</th></tr>
+    <tr><td><code>view</code> of files inside the plugin folder</td>
+        <td>allow</td>
+        <td>Skills constantly read their own SKILL.md files; auto-approving
+        removes dozens of permission prompts</td></tr>
+    <tr><td><code>bash</code> running one of 7 allowlisted plugin scripts</td>
+        <td>allow</td>
+        <td>Only if the command matches the exact argument shape declared in
+        <code>script-contracts.awk</code></td></tr>
+    <tr><td><code>task</code> spawning a <code>pstack:*</code> agent with a
+        model not in your sheet</td>
+        <td>deny</td>
+        <td>Hard enforcement: the model sheet is law, not advice</td></tr>
+    <tr><td>anything else</td>
+        <td>silent</td>
+        <td>No output = fall through to the normal permission flow</td></tr>
+  </table>
+  <p>And on Windows? The registration says <code>"powershell": "exit 0"</code>.
+  That is not laziness — it is the only safe choice. The gate engine is
+  written in sh + awk, which Windows does not guarantee, and in Copilot's hook
+  contract <strong>a hook that fails can block the tool call</strong>. A port
+  that might error would randomly deny your tools; an unconditional
+  <code>exit 0</code> is a guaranteed no-op.</p>
+  <p>The consequences for you are concrete:</p>
+  <ul>
+    <li><strong>More permission prompts.</strong> Plugin-file views and
+    allowlisted scripts are not auto-approved on Windows.</li>
+    <li><strong>No hard sheet enforcement.</strong> On Windows the model sheet
+    is honored only because the injected block <em>asks</em> the agent to —
+    advice, not law. On Unix the gate would deny a violating dispatch.</li>
+  </ul>
+
+  <h2>5 · Correction: there is a fourth switch</h2>
+  <p>Lesson 2's switch table said the only way to stop the mandate without
+  losing the skills was a user-instruction override. Reading
+  <code>session-start.sh</code> disproves that: the script checks your sheet
+  for a <code>session hook:</code> line before assembling anything
+  (<code>session-start.ps1</code> mirrors it, line 137).</p>
+  <pre><code> ~\.copilot\pstack-models.md
+-session hook: on
++session hook: off     ← hook prints nothing; no mandate injected</code></pre>
+  <p>This is a <em>plugin-native</em> off-switch — native to pstack, not to
+  Copilot. Copilot still fires the SessionStart hook every session; the
+  plugin's own script reads the line and exits printing nothing, and empty
+  output means nothing is injected. The plugin stays enabled, all ~70
+  skills and the agents stay invocable by name, only the injected block
+  disappears. Your updated switch table:</p>
+  <table>
+    <tr><th>Goal</th><th>Switch</th></tr>
+    <tr><td>Remove everything</td>
+        <td><code>settings.json</code> → <code>"pstack@pstack-claude": false</code></td></tr>
+    <tr><td>Stop the mandate, keep skills (plugin-native)</td>
+        <td><code>session hook: off</code> in <code>pstack-models.md</code></td></tr>
+    <tr><td>Soften the mandate, keep skills (override)</td>
+        <td>Line in <code>~\.copilot\copilot-instructions.md</code></td></tr>
+    <tr><td>Pin models per role</td>
+        <td>Edit the sheet or rerun <code>setup-pstack</code></td></tr>
+  </table>
+  <p>Lesson 2 and its reference sheet have been corrected accordingly. The
+  difference between the two middle rows: <code>session hook: off</code>
+  removes the block entirely (the agent never hears about poteto-mode), while
+  a user-instruction override leaves the block in context but outranks it —
+  useful if you want the routing <em>advice</em> visible but not binding.</p>
+
+  <div class="try">
+    <ol>
+      <li>Map the folder yourself: list the 21 files and sort each into
+        "mine" / "other runtime" / "Unix engine":
+        <pre><code>Get-ChildItem ~\.copilot\installed-plugins\pstack-claude\pstack\hooks -Name</code></pre></li>
+      <li>Open <code>pre-tool-use.awk</code> and find the three verdicts —
+        search for the strings <code>allow</code> and <code>deny</code>.
+        Notice what happens in every other case: nothing.</li>
+      <li>Reversible experiment: set <code>session hook: off</code> in
+        <code>~\.copilot\pstack-models.md</code>, open a fresh session, and
+        confirm the <code>EXTREMELY_IMPORTANT</code> block is gone. Flip it
+        back to <code>on</code> (your standing decision is to keep the setup
+        as-is until the poteto-mode experiment).</li>
+    </ol>
+  </div>
+
+  <h2>Check yourself</h2>
+  <div id="quiz"></div>
+
+  <div class="source">
+    Ground truth, as always, is the folder itself:
+    <code>~\.copilot\installed-plugins\pstack-claude\pstack\hooks\</code> —
+    now with a map. For the hook contract (matchers, stdin JSON, what a
+    failing hook does) see
+    <a href="https://docs.github.com/en/copilot/reference/hooks-reference">GitHub
+    Docs: Hooks reference</a> and
+    <a href="https://docs.github.com/en/copilot/concepts/customizations/hooks">Hooks
+    for Copilot</a>.
+  </div>
+
+  <div class="teacher">
+    Good follow-ups for your agent-teacher: “walk me through
+    <code>script-contracts.awk</code> line by line” or “which of the 7
+    allowlisted scripts would I actually benefit from on Windows?”. Both stay
+    read-only.
+  </div>
+
+  <nav class="lesson-nav">
+    <ul>
+      <li>Previous: <a href="0002-pstack-demystified.html">Lesson 0002 — the pstack machinery, demystified</a></li>
+      <li>Next: Lesson 0004 — provider philosophies compared (planned)</li>
+      <li>Reference: <a href="../reference/0003-hook-engine-cheatsheet.html">Hook engine cheat sheet</a></li>
+      <li>Workspace: <a href="../index.html">Index</a> · <a href="../GLOSSARY.md">Glossary</a> · <a href="../MISSION.md">Mission</a></li>
+    </ul>
+  </nav>
+</main>
+
+<script src="../assets/quiz.js"></script>
+<script src="../assets/mermaid.js"></script>
+<script>
+renderQuiz("quiz", [
+  {
+    q: "The hooks folder holds 21 files, but Copilot on Windows runs five. Why?",
+    answers: [
+      "One plugin ships hooks for ten runtimes",
+      "Copilot loads the rest during first setup",
+      "The extras are older plugin version backups",
+    ],
+    correct: 0,
+    explain: "Each runtime reads only its own slice: Copilot gets copilot-hooks.json + the .ps1 + four markdown parts; Claude, Codex, Muse and the rest each get theirs (section 1).",
+  },
+  {
+    q: "Why is the Unix half of the engine written in awk?",
+    answers: [
+      "awk parses JSON faster than alternatives do",
+      "POSIX guarantees sh and awk exist everywhere",
+      "Claude Code can only execute awk hooks",
+    ],
+    correct: 1,
+    explain: "The hook must run with zero installed dependencies on any Unix, and sh + awk are the only scripting languages POSIX guarantees (section 2).",
+  },
+  {
+    q: "Windows PreToolUse is registered as a bare 'exit 0'. Why?",
+    answers: [
+      "Windows cannot run hooks before tool calls",
+      "The tool gate is pointless on Windows setups",
+      "A failing hook can deny, a stub cannot",
+    ],
+    correct: 2,
+    explain: "The gate engine is sh + awk, which Windows lacks; since a failing hook can block tool calls, a guaranteed no-op beats a port that might error (section 4).",
+  },
+  {
+    q: "What does 'session hook: off' in pstack-models.md change?",
+    answers: [
+      "No mandate injected, skills stay fully invocable",
+      "Whole plugin disabled, including skills and agents",
+      "Subagent dispatch stops for the role-based skills",
+    ],
+    correct: 0,
+    explain: "It is the native fourth switch lesson 2 missed: session-start.sh/.ps1 check it and print nothing, while the plugin and all its skills stay enabled (section 5).",
+  },
+]);
+</script>
+</body>
+</html>
