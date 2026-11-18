@@ -30,6 +30,13 @@ A skill whose job is to route or orchestrate other skills rather than do the
 work itself (`poteto-mode`, `using-agent-skills`, `rpi`, `ask-matt`).
 _Avoid_: orchestrator skill, meta-prompt
 
+**TDD**:
+In this workspace: test-driven development, the test-first coding
+discipline (addyosmani, pstack, mattpocock all ship one). humanlayer's
+`rpi` artifact of the same acronym is always spelled out as "Technical
+Design Document" to keep auto-invocation from mixing the two.
+_Avoid_: unqualified "TDD" for humanlayer's design document
+
 **Collision domain**:
 A job claimed by skills from several providers at once (test-first coding,
 code review, planning, teaching), where auto-invocation picks by trigger
