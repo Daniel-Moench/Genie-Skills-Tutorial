@@ -13,6 +13,14 @@
   and the [hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference).
   Official lifecycle-hook docs (SessionStart, PreToolUse…). Use for: any
   claim about how hook registration and execution work (lesson 0002).
+- [GitHub Blog: Copilot CLI slash commands overview](https://github.blog/ai-and-ml/github-copilot/github-copilot-cli-for-beginners-overview-of-common-slash-commands/)
+  Official intro to CLI slash commands, incl. `/context` (token usage,
+  system usage, buffer). Use for: the plugin value audit (backlog item 8)
+  — measuring what installed plugins cost in context.
+- [YouTube: Tests with Superpowers, ECC, Graphify, Caveman, and claude-mem](https://youtu.be/rLdgRGJDPx0)
+  Reports tests of five plugins. Use for: the plugin value audit (backlog
+  item 8), as an external comparison alongside experiments with the
+  installed providers.
 - [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (117k★)
   25 production-engineering-practice skills (TDD, debugging, context
   engineering…). Browsable index at [skills.addy.ie](https://skills.addy.ie).
