@@ -18,6 +18,9 @@
   demystification; the keep/remove/reconfigure decision is deferred until
   after the hands-on poteto-mode experiment (backlog item 5).
 - Lessons in English.
+- **"TDD" = test-driven development** in this workspace; humanlayer's rpi
+  artifact is always spelled out "Technical Design Document" (`GLOSSARY.md`
+  entry, learning record 0005, 2026-11-18).
 
 ## Environment facts (verified 2026-11-13)
 
@@ -51,8 +54,12 @@
 3. ✔ Provider philosophies compared (0004): control axis, four portraits,
    collision domains, routing map. humanlayer "TDD" = Technical Design
    Document, not test-driven development.
+   - ✔ Spaced retest 2026-11-18 (record 0005): solid; misses were the
+     axis middle order and the gaps row — retarget in a later quiz.
 4. Experiment: humanlayer `rpi` end-to-end on a toy task
 5. Experiment: pstack `poteto-mode` routing (+ `architect` or `arena`)
+   - Include a hands-on `principle-*` leaf demo — Daniel flagged he doesn't
+     yet understand how to use them (record 0005).
 6. Combining providers: collisions (3× TDD), layering, custom routing
 7. Per-surface behavior: CLI vs VSCode vs IntelliJ vs Desktop App
 8. Plugin value audit: does each installed plugin still earn its cost?
