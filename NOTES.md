@@ -55,7 +55,17 @@
 5. Experiment: pstack `poteto-mode` routing (+ `architect` or `arena`)
 6. Combining providers: collisions (3× TDD), layering, custom routing
 7. Per-surface behavior: CLI vs VSCode vs IntelliJ vs Desktop App
-8. Final curation: choose the set, write the config, document it
+8. Plugin value audit: does each installed plugin still earn its cost?
+   - Daniel's concern (2026-11-18): many plugins (ECC, Superpowers…) look
+     redundant with modern models vs. plain prompts — maybe his four
+     providers only add tokens/cost without benefit.
+   - Part 1: find Copilot's counterpart to Claude Code `/doctor` — start with
+     CLI `/context` (token breakdown incl. system usage), check for others.
+   - Part 2: measure each provider's always-on overhead (instructions,
+     SessionStart hook injection, skill listing) via `/context`.
+   - Part 3: A/B experiment — same toy task with skill vs. plain prompt;
+     compare outcome quality and tokens. Feeds item 9.
+9. Final curation: choose the set, write the config, document it
 
 ---
 
