@@ -1,0 +1,114 @@
+{
+  "$format": "RUML",
+  "$specVersion": "1.0",
+  "capabilities": [
+    {
+      "id": "ruml:datapoints",
+      "payload": {
+        "data": {
+          "dp_repo_identity_verified": {
+            "name": "Target repository identity verified",
+            "type": "boolean",
+            "binding": {
+              "type": "input"
+            }
+          },
+          "dp_target_is_user_repo": {
+            "name": "Target is the user's repository",
+            "type": "boolean",
+            "binding": {
+              "type": "input"
+            }
+          },
+          "dp_target_confirmation_received": {
+            "name": "User confirmed the target repository",
+            "type": "boolean",
+            "binding": {
+              "type": "input"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ruml:query"
+    }
+  ],
+  "metadata": {
+    "id": "e7108c09-f087-4669-800e-d51e4adaeac5",
+    "title": "Issue creation target gate",
+    "description": "Experimental formalization of the issue-target checks in docs/agents/issue-tracker.md.",
+    "version": "0.1.0",
+    "created": "2026-11-20T00:00:00Z",
+    "modified": "2026-11-20T00:00:00Z",
+    "status": "draft",
+    "language": "en",
+    "tags": [
+      "agent-instructions",
+      "issue-triage",
+      "experiment"
+    ]
+  },
+  "rulemap": {
+    "nodes": {
+      "1": {
+        "id": "9eac8fed-0549-4eaf-ace6-0560f65b3c83",
+        "operator": "AND",
+        "label": "Issue creation is permitted for this target",
+        "description": "Both the target identity check and the target authorization check must pass.",
+        "children": [
+          "2",
+          "3"
+        ]
+      },
+      "2": {
+        "id": "64340457-fca2-4b8f-beb2-25062f71adff",
+        "label": "Target repository identity was verified",
+        "description": "The intended repository was identified from the git remote and checked with gh repo view --json nameWithOwner.",
+        "capabilities": [
+          {
+            "id": "ruml:query",
+            "payload": {
+              "description": "The repository identity check must have completed successfully.",
+              "expression": "dp_repo_identity_verified = true"
+            }
+          }
+        ]
+      },
+      "3": {
+        "id": "ead28c33-e681-4f7b-80cf-9386c7de165f",
+        "operator": "OR",
+        "label": "Target is authorized",
+        "description": "The user owns the target repository, or explicitly confirmed it.",
+        "children": [
+          "4",
+          "5"
+        ]
+      },
+      "4": {
+        "id": "f36291ed-9c82-48d8-80a7-d1a847af2ac8",
+        "label": "Target is the user's repository",
+        "capabilities": [
+          {
+            "id": "ruml:query",
+            "payload": {
+              "expression": "dp_target_is_user_repo = true"
+            }
+          }
+        ]
+      },
+      "5": {
+        "id": "97e2beb8-b9a4-4190-ac88-05488d163e95",
+        "label": "User confirmed the target repository",
+        "capabilities": [
+          {
+            "id": "ruml:query",
+            "payload": {
+              "expression": "dp_target_confirmation_received = true"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,6 +1,8 @@
 # Issue tracker: GitHub
 
-Issues and specs for this repository live in GitHub Issues. Use the `gh` CLI. Infer the repository from `git remote -v`; before creating an issue, check `gh repo view --json nameWithOwner` and confirm the target if it is not the user's repository. Never file issues in `mattpocock/skills` unless the user owns it.
+Issues and specs for this repository live in GitHub Issues. Use the `gh` CLI. Infer the repository from `git remote -v`; before creating an issue, check `gh repo view --json nameWithOwner` and confirm the target if it is not the user's repository.
+<!-- RUML experiment: ../../experiments/ruml-agent-mandates/issue-create-gate.ruml node=1 (draft; companion only, not enforced) -->
+Never file issues in `mattpocock/skills` unless the user owns it.
 
 ## Conventions
 
